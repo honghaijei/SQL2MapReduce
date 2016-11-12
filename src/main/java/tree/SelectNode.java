@@ -13,4 +13,6 @@ public class SelectNode extends TreeNode {
     public List<TreeNode> from = new ArrayList<>();
     public List<String> columns = new ArrayList<>();
     public TreeNode where;
+    public GroupByNode groupby;
+    public OrderByNode orderby;
 }
