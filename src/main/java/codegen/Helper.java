@@ -20,7 +20,7 @@ public class Helper {
             "import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;\n" +
             "import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;\n" +
             "import org.apache.hadoop.mapreduce.lib.partition.*;";
-    
+
     String SplitFunction = "        public String[] Split(String s, char seperator, int expected_length) {\n" +
             "            String[] ans = new String[expected_length];\n" +
             "            int pos = 0;\n" +
