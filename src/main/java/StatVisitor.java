@@ -1,4 +1,6 @@
+import common.schema.DataType;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.apache.commons.lang.NotImplementedException;
 import tree.*;
 
 import java.util.ArrayList;
@@ -12,13 +14,18 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitSelect_clause(@NotNull MySQLParser.Select_clauseContext ctx) {
         SelectNode node = new SelectNode();
-        node.where = visit(ctx.where_clause());
+        if (ctx.where_clause() != null) {
+            node.where = (FilterNode) visit(ctx.where_clause());
+        }
         for (MySQLParser.Table_referenceContext c : ctx.table_references().table_reference()) {
             node.from.add(visit(c));
         }
 
-        for (MySQLParser.Column_nameContext c : ctx.column_list().column_name()) {
-            node.columns.add(c.getText());
+        for (MySQLParser.ElementContext c : ctx.column_list().element()) {
+            node.columns.add((ArithNode)visit(c));
+        }
+        if (ctx.groupby_clause() != null) {
+            node.groupby = (GroupByNode)visit(ctx.groupby_clause());
         }
         return node;
     }
@@ -83,7 +90,7 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     public TreeNode visitElement(@NotNull MySQLParser.ElementContext ctx) {
         ArithNode res = new ArithNode();
         for (MySQLParser.Term_elementContext c : ctx.term_element()) {
-            res.children.add(visit(c));
+            res.children.add((ArithNode)visit(c));
         }
         for (MySQLParser.PlusminusContext c : ctx.plusminus()) {
             res.op.add(c.getText());
@@ -94,7 +101,7 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     public TreeNode visitTerm_element(@NotNull MySQLParser.Term_elementContext ctx) {
         ArithNode res = new ArithNode();
         for (MySQLParser.Factor_elementContext c : ctx.factor_element()) {
-            res.children.add(visit(c));
+            res.children.add((ArithNode)visit(c));
         }
         for (MySQLParser.MuldivContext c : ctx.muldiv()) {
             res.op.add(c.getText());
@@ -106,7 +113,11 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
         ArithNode res = new ArithNode();
         if (ctx.MINUS() != null) {
             res.op.add("-");
-            res.children.add(visit(ctx.element()));
+            res.children.add((ArithNode)visit(ctx.element()));
+            return res;
+        } else if (ctx.function() != null) {
+            res.function = ctx.function().getText();
+            res.children.add((ArithNode)visit(ctx.element()));
             return res;
         } else if (ctx.LPAREN() != null) {
             return visit(ctx.element());
@@ -115,10 +126,26 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
             return res;
         } else {
             res.constant = ctx.getText();
+            if (ctx.FLOAT() != null) {
+                res.type = DataType.DOUBLE;
+            } else if (ctx.INT() != null) {
+                res.type = DataType.INT32;
+            } else if (ctx.STR() != null) {
+                res.type = DataType.STRING;
+            } else {
+                throw new NotImplementedException();
+            }
             return res;
         }
     }
-
+    @Override
+    public TreeNode visitGroupby_clause(@NotNull MySQLParser.Groupby_clauseContext ctx) {
+        GroupByNode node = new GroupByNode();
+        for (MySQLParser.ElementContext c : ctx.column_list().element()) {
+            node.cols.add(c.getText());
+        }
+        return node;
+    }
 
 
 }

@@ -2,9 +2,7 @@ package codegen;
 
 import common.schema.DataType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import static common.Helper.DataType2JavaType;
-import static common.Helper.Spaces;
+import codegen.Helper;
 
 /**
  * Created by honghaijie on 11/12/16.
@@ -31,19 +29,19 @@ public class CompositeKeyGenerator {
                 + ReadFromDataInput()
                 + "        }\n"
                 + Definition()
-                + "    }";
+                + "    }\n";
     }
     public String Definition() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < types.length; ++i) {
-            sb.append("        public " + DataType2JavaType(types[i]) + " k" + i + ";\n");
+            sb.append("        public " + Helper.DataType2JavaType(types[i]) + " k" + i + ";\n");
         }
         return sb.toString();
     }
     public String ConstructorArgs() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < types.length; ++i) {
-            sb.append(DataType2JavaType(types[i]) + " k" + i);
+            sb.append(Helper.DataType2JavaType(types[i]) + " k" + i);
             if (i != types.length - 1) {
                 sb.append(", ");
             }
@@ -93,20 +91,14 @@ public class CompositeKeyGenerator {
     }
     public String CompareFunction(int s, int n) {
         if (s == n) {
-            return Spaces((s + 3) * 4) + "return 0;\n";
+            return Helper.Spaces((s + 3) * 4) + "return 0;\n";
         } else {
-            return Spaces((s + 3) * 4) + "if (k" + s + ".equals(y.k" + s + ")) {\n"
+            return Helper.Spaces((s + 3) * 4) + "if (k" + s + ".equals(y.k" + s + ")) {\n"
                     + CompareFunction(s + 1, n)
-                    + Spaces((s + 3) * 4) + "}\n"
-                    + Spaces((s + 3) * 4) + "else {\n"
-                    + Spaces((s + 4) * 4) + "return k" + s + ".compareTo(y.k" + s + ");\n"
-                    + Spaces((s + 3) * 4) + "}\n";
+                    + Helper.Spaces((s + 3) * 4) + "} else {\n"
+                    + Helper.Spaces((s + 4) * 4) + "return k" + s + ".compareTo(y.k" + s + ");\n"
+                    + Helper.Spaces((s + 3) * 4) + "}\n";
         }
     }
-    public static void main(String[] args) {
-        System.out.println(new CompositeKeyGenerator(new DataType[]{DataType.STRING, DataType.INT32, DataType.DOUBLE}).Generate());
-    }
-
-
     DataType[] types;
 }

@@ -10,7 +10,7 @@ stat
    ;
 
 select_clause
-   : SELECT column_list ( FROM table_references )? ( where_clause )? (groupby_clause)? (orderby_clause)?
+   : SELECT column_list FROM table_references ( where_clause )? (groupby_clause)? (orderby_clause)?
    ;
 
 table_name
@@ -26,7 +26,7 @@ column_name
    ;
 
 column_list
-   : column_name ( COMMA column_name )*
+   : element ( COMMA element )*
    ;
 
 where_clause
@@ -58,8 +58,7 @@ term_element
 factor_element
    : LPAREN element RPAREN
    | MINUS element
-   | FUNC LPAREN element RPAREN
-   | ID
+   | function LPAREN element RPAREN
    | STR
    | INT
    | FLOAT
@@ -108,4 +107,8 @@ plusminus
 muldiv
    : MULTIPLE
    | DIVIDE
+   ;
+
+function
+   : ID
    ;

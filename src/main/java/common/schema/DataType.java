@@ -6,5 +6,6 @@ package common.schema;
 public enum DataType {
     INT32,
     DOUBLE,
-    STRING
+    STRING,
+    UNKNOWN,
 }

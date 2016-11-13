@@ -19,12 +19,15 @@ public class Schema {
     public int FindByName(String name) {
         int ret = 0;
         for (SchemaColumn sc : cols) {
-            if (sc.name == name) {
+            if (sc.name.equals(name)) {
                 return ret;
             }
             ++ret;
         }
         return -1;
+    }
+    public int size() {
+        return cols.size();
     }
     public static Schema ParseFromString(String raw) {
         // TODO
