@@ -91,7 +91,7 @@ public class OrderByGenerator {
     private String output;
 
     public static void main(String[] args) {
-        Schema s = new Schema();
+        Schema s = new Schema("");
         s.Add("Name", DataType.STRING);
         s.Add("Age", DataType.INT32);
         s.Add("Height", DataType.DOUBLE);

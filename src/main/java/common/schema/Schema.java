@@ -7,8 +7,8 @@ import java.util.List;
  * Created by honghaijie on 11/11/16.
  */
 public class Schema {
-    public Schema() {
-
+    public Schema(String tableName) {
+        this.tableName = tableName;
     }
     public void Add(String name, DataType type) {
         cols.add(new SchemaColumn(name, type));
@@ -17,9 +17,21 @@ public class Schema {
         return cols.get(i);
     }
     public int FindByName(String name) {
+        String[] arr = name.split("\\.");
+        String qtable = null;
+        String qcol = null;
+        if (arr.length > 1) {
+            qtable = arr[0];
+            qcol = arr[1];
+        } else {
+            qcol = arr[0];
+        }
+        if (qtable != null && !qtable.equals(this.tableName)) {
+            return -1;
+        }
         int ret = 0;
         for (SchemaColumn sc : cols) {
-            if (sc.name.equals(name)) {
+            if (sc.name.equals(qcol)) {
                 return ret;
             }
             ++ret;
@@ -31,7 +43,8 @@ public class Schema {
     }
     public static Schema ParseFromString(String raw) {
         // TODO
-        return new Schema();
+        return new Schema("");
     }
     private List<SchemaColumn> cols = new ArrayList<>();
+    private String tableName;
 }

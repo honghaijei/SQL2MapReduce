@@ -88,6 +88,9 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     }
     @Override
     public TreeNode visitElement(@NotNull MySQLParser.ElementContext ctx) {
+        if (ctx.term_element().size() == 1) {
+            return visit(ctx.term_element(0));
+        }
         ArithNode res = new ArithNode();
         for (MySQLParser.Term_elementContext c : ctx.term_element()) {
             res.children.add((ArithNode)visit(c));
@@ -99,6 +102,9 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     }
     @Override
     public TreeNode visitTerm_element(@NotNull MySQLParser.Term_elementContext ctx) {
+        if (ctx.factor_element().size() == 1) {
+            return visit(ctx.factor_element(0));
+        }
         ArithNode res = new ArithNode();
         for (MySQLParser.Factor_elementContext c : ctx.factor_element()) {
             res.children.add((ArithNode)visit(c));

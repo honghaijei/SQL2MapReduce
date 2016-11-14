@@ -80,8 +80,9 @@ public class AggrGenerator {
                     ";\n");
         }
         sb.append("            int count = 0;\n");
+        sb.append("            String[] arr = null;\n");
         sb.append("            for (Text value : values) {\n" +
-                "                String[] arr = Split(value.toString(), '|', " + schema.size() + ");\n");
+                "                arr = Split(value.toString(), '|', " + schema.size() + ");\n");
         sb.append("                ++count;\n");
         List<AggrFunction> afList = new ArrayList<>();
         StringBuilder external = new StringBuilder();
@@ -113,7 +114,7 @@ public class AggrGenerator {
             if (i != 0) {
                 sb.append("+\"|\"+");
             }
-            sb.append("(" + aeg.Generate() + ").toString()");
+            sb.append("((Object)(" + aeg.Generate() + ")).toString())");
         }
         sb.append(");\n");
         sb.append("        }\n");
