@@ -82,11 +82,11 @@ public class Helper {
             "        int pos = 0;\n" +
             "        for(int i = 0;;) {\n" +
             "            int nx = s.indexOf(seperator, pos);\n" +
-            "            if (nx == -1) nx = s.length();\n" +
+            "            if (nx == -1 || i == expected_length - 1) nx = s.length();\n" +
             "            code[i++] = s.substring(pos, nx);\n" +
             "            if (nx == s.length()) break;\n" +
             "            pos = nx + 1;\n" +
             "        };\n" +
             "        return code;\n" +
-            "    }\n";
+            "    }";
 }

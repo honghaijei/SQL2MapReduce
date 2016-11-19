@@ -1,10 +1,7 @@
 import common.schema.DataType;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.commons.lang.NotImplementedException;
-import tree.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import astree.*;
 
 /**
  * Created by hahong on 2016/9/16.
@@ -15,10 +12,10 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     public TreeNode visitSelect_clause(@NotNull MySQLParser.Select_clauseContext ctx) {
         SelectNode node = new SelectNode();
         if (ctx.where_clause() != null) {
-            node.where = (FilterNode) visit(ctx.where_clause());
+            node.where = visit(ctx.where_clause());
         }
         for (MySQLParser.Table_referenceContext c : ctx.table_references().table_reference()) {
-            node.from.add(visit(c));
+            node.from.add((TableNode)visit(c));
         }
 
         for (MySQLParser.ElementContext c : ctx.column_list().element()) {
@@ -37,7 +34,7 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
             node.tableName = ctx.table_name().getText();
             node.alias = ctx.table_alias() == null ? null : ctx.table_alias().getText();
         } else {
-            node.subQuery = visit(ctx.subquery().select_clause());
+            node.subQuery = (SelectNode)visit(ctx.subquery().select_clause());
             node.alias = ctx.table_alias() == null ? null : ctx.table_alias().getText();
         }
         return node;
@@ -49,6 +46,9 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     }
     @Override
     public TreeNode visitExpression(@NotNull MySQLParser.ExpressionContext ctx) {
+        if (ctx.and_expression().size() == 1) {
+            return visit(ctx.and_expression(0));
+        }
         FilterNode res = new FilterNode();
         for (MySQLParser.And_expressionContext c : ctx.and_expression()) {
             res.filters.add(visit(c));
@@ -58,6 +58,9 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     }
     @Override
     public TreeNode visitAnd_expression(@NotNull MySQLParser.And_expressionContext ctx) {
+        if (ctx.atom_expression().size() == 1) {
+            return visit(ctx.atom_expression(0));
+        }
         FilterNode res = new FilterNode();
         for (MySQLParser.Atom_expressionContext c : ctx.atom_expression()) {
             res.filters.add(visit(c));

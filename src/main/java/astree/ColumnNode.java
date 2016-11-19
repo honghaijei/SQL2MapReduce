@@ -1,4 +1,4 @@
-package tree;
+package astree;
 
 /**
  * Created by honghaijie on 11/8/16.

@@ -1,22 +1,16 @@
 /**
  * Created by hahong on 2016/9/15.
  */
-import codegen.AggrGenerator;
-import codegen.ArithExpressionGenerator;
 import codegen.WhereGenerator;
 import common.schema.DataType;
 import common.schema.Schema;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 import org.antlr.v4.runtime.tree.ParseTree;
-import tree.ArithNode;
-import tree.FilterNode;
-import tree.SelectNode;
-import tree.TreeNode;
+import astree.*;
 
 public class Main {
     public static void main(String[] args) {
-        CharStream stream = new ANTLRInputStream("select avg(Age*Height) + sum(Height), Name from Users where Age!=12 or (Height>1.1 && Age=11) group by Name");
+        CharStream stream = new ANTLRInputStream("select Users.Name, Users.Age, Users.Height, Scores.score from Users, Scores where Users.Name =  Score.Name");
         MySQLLexer lexer = new MySQLLexer(stream);
         MySQLParser parser = new MySQLParser(new CommonTokenStream(lexer));
         ParseTree tree = parser.stat();

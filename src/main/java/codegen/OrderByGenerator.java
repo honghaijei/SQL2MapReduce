@@ -2,28 +2,27 @@ package codegen;
 
 import common.schema.DataType;
 import common.schema.Schema;
-import tree.OrderByNode;
-
-import java.util.ArrayList;
-import java.util.List;
+import astree.OrderByNode;
+import dag.Column;
+import dag.OrderByGraphNode;
 
 /**
  * Created by honghaijie on 11/11/16.
  */
 public class OrderByGenerator {
-    public OrderByGenerator(OrderByNode node, Schema schema, String input, String output) {
-        this.schema = schema;
-        orderByColIndex = new int[node.cols.size()];
-        orderByColTypes = new DataType[node.cols.size()];
+    public OrderByGenerator(OrderByGraphNode node) {
+        this.schema = node.GetInputSchemas().get(0);
+        this.input = node.GetInputs().get(0);
+        this.output = node.GetOutput();
+        orderByColIndex = new int[node.GetOrderByKeys().size()];
+        orderByColTypes = new DataType[node.GetOrderByKeys().size()];
         int i = 0;
-        for (String colName : node.cols) {
-            int idx = schema.FindByName(colName);
+        for (Column col : node.GetOrderByKeys()) {
+            int idx = schema.GetPosByName(col.GetKey());
             orderByColIndex[i] = idx;
             orderByColTypes[i] = schema.Get(idx).type;
             ++i;
         }
-        this.input = input;
-        this.output = output;
     }
     public String Generate() {
         return Helper.Import +
@@ -98,6 +97,6 @@ public class OrderByGenerator {
 
         OrderByNode node = new OrderByNode();
         node.cols.add("Name");
-        System.out.println(new OrderByGenerator(node, s, "input", "output").Generate());
+        //System.out.println(new OrderByGenerator(node).Generate());
     }
 }

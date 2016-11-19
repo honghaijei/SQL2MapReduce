@@ -3,19 +3,22 @@ package codegen;
 import common.schema.DataType;
 import common.schema.Schema;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import tree.ArithNode;
+import astree.ArithNode;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static common.Utils.GetSchemaIdxByColumnName;
 
 /**
  * Created by honghaijie on 11/12/16.
  */
 public class ArithExpressionGenerator {
-    public ArithExpressionGenerator(ArithNode node, Schema schema) {
+    public ArithExpressionGenerator(ArithNode node, List<Schema> schemas, List<String> arrayNames) {
         this.node = node;
-        this.schema = schema;
-        node.GuessReturnType(schema);
+        this.schemas = schemas;
+        this.arrayNames = arrayNames;
+        node.GuessReturnType(schemas);
     }
     public List<ArithNode> GetAggrInternal() {
         List<ArithNode> ans = new ArrayList<>();
@@ -42,8 +45,9 @@ public class ArithExpressionGenerator {
             return node.constant;
         }
         if (node.columnName != null) {
-            int idx = schema.FindByName(node.columnName);
-            return Helper.ParseString2JavaType("arr["+idx + "]", node.type);
+            int schemaIdx = GetSchemaIdxByColumnName(schemas, node.columnName);
+            int idx = schemas.get(schemaIdx).GetPosByName(node.columnName);
+            return Helper.ParseString2JavaType(arrayNames.get(schemaIdx) + "["+idx + "]", node.type);
         }
         if (node.function != null) {
             throw new NotImplementedException();
@@ -70,5 +74,6 @@ public class ArithExpressionGenerator {
         return sb.toString();
     }
     private ArithNode node;
-    private Schema schema;
+    private List<Schema> schemas;
+    private List<String> arrayNames;
 }

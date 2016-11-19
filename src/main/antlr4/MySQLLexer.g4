@@ -3,7 +3,7 @@ lexer grammar MySQLLexer;
 @header {
 }
 SELECT
-   : 'select'
+   : 'node'
    ;
 
 

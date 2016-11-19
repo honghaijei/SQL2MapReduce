@@ -3,34 +3,31 @@ package codegen;
 import common.AggrFunction;
 import common.schema.DataType;
 import common.schema.Schema;
-import tree.ArithNode;
-import tree.GroupByNode;
-import tree.SelectNode;
+import astree.ArithNode;
+import dag.AggrGraphNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by honghaijie on 11/12/16.
  */
 public class AggrGenerator {
-    public AggrGenerator(SelectNode select, Schema schema, String input, String output) {
-        this.select = select;
-        this.schema = schema;
-        GroupByNode node = select.groupby;
-        groupByColIndex = new int[node.cols.size()];
-        groupByColTypes = new DataType[node.cols.size()];
+    public AggrGenerator(AggrGraphNode node) {
+        this.node = node;
+        this.schema = node.GetInputSchemas().get(0);
+        this.cols = node.GetGroupByKeys();
+        int sz = cols.size();
+        groupByColIndex = new int[sz];
+        groupByColTypes = new DataType[sz];
         int i = 0;
-        for (String colName : node.cols) {
-            int idx = schema.FindByName(colName);
+        for (String colName : cols) {
+            int idx = schema.GetPosByName(colName);
             groupByColIndex[i] = idx;
             groupByColTypes[i] = schema.Get(idx).type;
             ++i;
         }
-        this.input = input;
-        this.output = output;
+        this.input = node.GetInputs().get(0);
+        this.output = node.GetOutput();
     }
     public String Generate() {
         return Helper.Import +
@@ -57,8 +54,8 @@ public class AggrGenerator {
     public String AggrReducer() {
         int vid = 0;
         Map<ArithNode, String> arithNameMapper = new HashMap<>();
-        for (ArithNode node : select.columns) {
-            ArithExpressionGenerator aeg = new ArithExpressionGenerator(node, schema);
+        for (ArithNode node : this.node.GetOutputColumns()) {
+            ArithExpressionGenerator aeg = new ArithExpressionGenerator(node, Arrays.asList(schema), Arrays.asList("arr"));
             List<ArithNode> internalNodes = aeg.GetAggrInternal();
             for (ArithNode internalNode : internalNodes) {
                 arithNameMapper.put(internalNode, "agg" + vid);
@@ -91,7 +88,7 @@ public class AggrGenerator {
             List<String> argsExpression = new ArrayList<>();
             for (ArithNode ch : node.children) {
                 argsTypes.add(ch.type);
-                argsExpression.add(new ArithExpressionGenerator(ch, schema).Generate());
+                argsExpression.add(new ArithExpressionGenerator(ch, Arrays.asList(schema), Arrays.asList("arr")).Generate());
             }
             AggrFunction f = new AggrFunction(node.function, argsTypes);
             sb.append(Helper.Spaces(16) + f.GenerateInternal(arithNameMapper.get(node), argsExpression));
@@ -108,9 +105,9 @@ public class AggrGenerator {
         }
         sb.append("            context.write(t, ");
         sb.append("new Text(");
-        for (int i = 0; i < select.columns.size(); ++i) {
-            ArithNode node = select.columns.get(i);
-            ArithExpressionGenerator aeg = new ArithExpressionGenerator(node, schema);
+        for (int i = 0; i < node.GetOutputColumns().size(); ++i) {
+            ArithNode node = this.node.GetOutputColumns().get(i);
+            ArithExpressionGenerator aeg = new ArithExpressionGenerator(node, Arrays.asList(schema), Arrays.asList("arr"));
             if (i != 0) {
                 sb.append("+\"|\"+");
             }
@@ -147,8 +144,9 @@ public class AggrGenerator {
                 "    }\n" +
                 "\n";
     }
-    private SelectNode select;
+    private AggrGraphNode node;
     private Schema schema;
+    private List<String> cols;
     private int[] groupByColIndex;
     private DataType[] groupByColTypes;
     private String input;

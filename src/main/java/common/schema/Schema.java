@@ -10,13 +10,16 @@ public class Schema {
     public Schema(String tableName) {
         this.tableName = tableName;
     }
+    public String Name() {
+        return tableName;
+    }
     public void Add(String name, DataType type) {
         cols.add(new SchemaColumn(name, type));
     }
     public SchemaColumn Get(int i) {
         return cols.get(i);
     }
-    public int FindByName(String name) {
+    public int GetPosByName(String name) {
         String[] arr = name.split("\\.");
         String qtable = null;
         String qcol = null;
