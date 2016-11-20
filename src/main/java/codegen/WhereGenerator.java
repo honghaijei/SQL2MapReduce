@@ -8,12 +8,13 @@ import astree.SimpleFilterNode;
 import astree.TreeNode;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by honghaijie on 11/14/16.
  */
 public class WhereGenerator {
-    public WhereGenerator(TreeNode node, Schema schema) {
+    public WhereGenerator(TreeNode node, List<Schema> schema) {
         this.node = node;
         this.schema = schema;
     }
@@ -51,11 +52,11 @@ public class WhereGenerator {
             return sb.toString();
         }
         if (root instanceof ArithNode) {
-            ArithExpressionGenerator g = new ArithExpressionGenerator((ArithNode)root, Arrays.asList(schema), Arrays.asList("arr"));
+            ArithExpressionGenerator g = new ArithExpressionGenerator((ArithNode)root, schema, Arrays.asList("arr"));
             return g.Generate();
         }
         throw new NotImplementedException();
     }
     private TreeNode node;
-    private Schema schema;
+    private List<Schema> schema;
 }

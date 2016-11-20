@@ -9,4 +9,8 @@ public class TableNode extends TreeNode {
     public SelectNode subQuery;
     public String tableName;
     public String alias;
+    public String GetName() {
+        if (alias != null) return alias;
+        return tableName;
+    }
 }

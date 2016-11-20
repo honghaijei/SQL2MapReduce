@@ -44,9 +44,18 @@ public class Schema {
     public int size() {
         return cols.size();
     }
+    public List<SchemaColumn> Cols() {
+        return this.cols;
+    }
     public static Schema ParseFromString(String raw) {
         // TODO
         return new Schema("");
+    }
+    public static Schema Combine(String name, Schema schema1, Schema schema2) {
+        Schema ans = new Schema(name);
+        ans.Cols().addAll(schema1.Cols());
+        ans.Cols().addAll(schema2.Cols());
+        return ans;
     }
     private List<SchemaColumn> cols = new ArrayList<>();
     private String tableName;

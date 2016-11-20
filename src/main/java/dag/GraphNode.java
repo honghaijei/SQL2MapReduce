@@ -13,7 +13,7 @@ public abstract class GraphNode {
     public List<Schema> GetInputSchemas() {
         List<Schema> schemas = new ArrayList<>();
         for (String s : GetInputs()) {
-            schemas.add(SchemaSet.Get().Get(s));
+            schemas.add(SchemaSet.Instance().Get(s));
         }
         return schemas;
     }

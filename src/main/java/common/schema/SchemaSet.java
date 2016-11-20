@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class SchemaSet {
     static SchemaSet schemaSet = new SchemaSet();
-    public static SchemaSet Get() {
+    public static SchemaSet Instance() {
         return schemaSet;
     }
 
@@ -19,6 +19,19 @@ public class SchemaSet {
     }
     public Schema Get(String name) {
         return schemas.get(name);
+    }
+    public String GetTableNameByColumnName(String s) {
+        String[] arr = s.split("\\.");
+        if (arr.length == 2) {
+            return arr[0];
+        }
+        for (String k : schemas.keySet()) {
+            Schema sc = schemas.get(k);
+            if (sc.GetPosByName(arr[0]) != -1) {
+                return k;
+            }
+        }
+        return null;
     }
     private Map<String, Schema> schemas = new HashMap<>();
 }

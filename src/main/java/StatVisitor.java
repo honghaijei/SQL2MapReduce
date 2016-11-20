@@ -84,8 +84,8 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
     @Override
     public TreeNode visitSimple_expression(@NotNull MySQLParser.Simple_expressionContext ctx) {
         SimpleFilterNode res = new SimpleFilterNode();
-        res.left = visit(ctx.element(0));
-        res.right = visit(ctx.element(1));
+        res.left = (ArithNode)visit(ctx.element(0));
+        res.right = (ArithNode)visit(ctx.element(1));
         res.op = ctx.relational_op().getText();
         return res;
     }

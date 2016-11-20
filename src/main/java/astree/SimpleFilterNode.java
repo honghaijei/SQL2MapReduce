@@ -10,7 +10,7 @@ public class SimpleFilterNode extends TreeNode {
     public boolean IsEqui() {
         return op.equals("=");
     }
-    public TreeNode left;
-    public TreeNode right;
+    public ArithNode left;
+    public ArithNode right;
     public String op;
 }
