@@ -27,6 +27,12 @@ public class Column {
             key = arr[1];
         }
     }
+    public void SetTable(String table) {
+        this.table = table;
+    }
+    public void SetKey(String key) {
+        this.key = key;
+    }
     public String GetTable() {
         return table;
     }

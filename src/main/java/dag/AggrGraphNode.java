@@ -1,6 +1,7 @@
 package dag;
 
 import astree.ArithNode;
+import codegen.AggrGenerator;
 import common.schema.Schema;
 
 import java.util.ArrayList;
@@ -30,7 +31,10 @@ public class AggrGraphNode extends GraphNode {
             if (outputColumnNames != null) {
                 cname = outputColumnNames.get(i);
             }
-            ans.Add(cname, node.GuessReturnType(Arrays.asList(inputSchema)));
+            if (cname == null) {
+                cname = node.GetDefaultName();
+            }
+            ans.Add(cname, node.GuessReturnType());
             ++i;
         }
         return ans;
@@ -48,7 +52,7 @@ public class AggrGraphNode extends GraphNode {
 
     @Override
     public String Generate() {
-        return null;
+        return new AggrGenerator(this).Generate();
     }
 
     public List<String> GetGroupByKeys() {

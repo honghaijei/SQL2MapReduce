@@ -3,6 +3,7 @@ package common;
 import common.schema.Schema;
 import dag.Column;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,6 @@ public class Utils {
     public static int GetSchemaIdxByColumnName(List<Schema> schemas, String columnName) {
         for (int i = 0; i < schemas.size(); ++i) {
             Schema schema = schemas.get(i);
-            Column c = new Column(columnName);
-            if (c.GetTable() != null && !c.GetTable().equals(schema.Name())) {
-                continue;
-            }
             int idx = schema.GetPosByName(columnName);
             if (idx == -1) {
                 continue;
@@ -33,5 +30,16 @@ public class Utils {
             return i;
         }
         return -1;
+    }
+    public static void CreateFolderIfNotExist(String path) {
+        File theDir = new File(path);
+        if (!theDir.exists()) {
+            try{
+                theDir.mkdir();
+            }
+            catch(SecurityException se){
+                //handle it
+            }
+        }
     }
 }

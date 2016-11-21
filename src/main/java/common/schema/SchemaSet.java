@@ -1,6 +1,7 @@
 package common.schema;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,5 +34,6 @@ public class SchemaSet {
         }
         return null;
     }
-    private Map<String, Schema> schemas = new HashMap<>();
+
+    private Map<String, Schema> schemas = new LinkedHashMap<>();
 }

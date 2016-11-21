@@ -113,5 +113,8 @@ public class DagConverter {
         }
         return inputTable;
     }
+    public List<GraphNode> GetNodes() {
+        return nodes;
+    }
     private List<GraphNode> nodes = new ArrayList<>();
 }

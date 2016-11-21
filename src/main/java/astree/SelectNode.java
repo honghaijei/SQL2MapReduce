@@ -25,7 +25,6 @@ public class SelectNode extends TreeNode {
 
     public List<TableNode> from = new ArrayList<>();
     public List<ArithNode> columns = new ArrayList<>();
-
     //FilterNode or SimpleFilterNode
     public TreeNode where;
 

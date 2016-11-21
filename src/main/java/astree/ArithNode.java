@@ -3,6 +3,7 @@ package astree;
 import common.AggrFunction;
 import common.schema.DataType;
 import common.schema.Schema;
+import common.schema.SchemaSet;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
@@ -22,23 +23,25 @@ public class ArithNode extends TreeNode {
     public List<String> op = new ArrayList<>();
     public DataType type = DataType.UNKNOWN;
     public String function;
+    public String alias;
     public boolean IsColumn() {
         return columnName != null;
     }
 
-    public DataType GuessReturnType(List<Schema> schemas) {
+    public DataType GuessReturnType() {
         if (this.constant != null) {
             return type;
         }
         if (this.columnName != null) {
-            int schemaIdx = GetSchemaIdxByColumnName(schemas, columnName);
-            Schema schema = schemas.get(schemaIdx);
+            String schemaName = SchemaSet.Instance().GetTableNameByColumnName(columnName);
+            Schema schema = SchemaSet.Instance().Get(schemaName);
+
             this.type = schema.Get(schema.GetPosByName(columnName)).type;
             return this.type;
         }
         List<DataType> inputTypes = new ArrayList<>();
         for (ArithNode ch : children) {
-            inputTypes.add(ch.GuessReturnType(schemas));
+            inputTypes.add(ch.GuessReturnType());
         }
         if (this.function != null) {
             AggrFunction f = new AggrFunction(this.function, inputTypes);
@@ -73,6 +76,9 @@ public class ArithNode extends TreeNode {
         return retType;
     }
     public String GetDefaultName() {
+        if (this.alias != null) {
+            return this.alias;
+        }
         if (this.columnName != null) {
             return this.columnName;
         }

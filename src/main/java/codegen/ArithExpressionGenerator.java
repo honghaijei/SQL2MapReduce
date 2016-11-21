@@ -18,7 +18,7 @@ public class ArithExpressionGenerator {
         this.node = node;
         this.schemas = schemas;
         this.arrayNames = arrayNames;
-        node.GuessReturnType(schemas);
+        node.GuessReturnType();
     }
     public List<ArithNode> GetAggrInternal() {
         List<ArithNode> ans = new ArrayList<>();

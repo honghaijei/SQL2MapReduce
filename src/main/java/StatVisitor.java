@@ -1,4 +1,5 @@
 import common.schema.DataType;
+import dag.OrderByGraphNode;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.commons.lang.NotImplementedException;
 import astree.*;
@@ -18,13 +19,29 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
             node.from.add((TableNode)visit(c));
         }
 
-        for (MySQLParser.ElementContext c : ctx.column_list().element()) {
-            node.columns.add((ArithNode)visit(c));
+        for (MySQLParser.Select_columnContext c : ctx.select_column_list().select_column()) {
+            ArithNode anode = (ArithNode)visit(c.element());
+            if (c.ID() != null) {
+                anode.alias = c.ID().getText();
+            }
+            node.columns.add(anode);
         }
         if (ctx.groupby_clause() != null) {
             node.groupby = (GroupByNode)visit(ctx.groupby_clause());
         }
+        if (ctx.orderby_clause() != null) {
+            node.orderby = (OrderByNode)visit(ctx.orderby_clause());
+        }
         return node;
+    }
+
+    @Override
+    public TreeNode visitOrderby_clause(@NotNull MySQLParser.Orderby_clauseContext ctx) {
+        OrderByNode ans = new OrderByNode();
+        for (MySQLParser.ElementContext c : ctx.column_list().element()) {
+            ans.cols.add(c.getText());
+        }
+        return ans;
     }
 
     @Override

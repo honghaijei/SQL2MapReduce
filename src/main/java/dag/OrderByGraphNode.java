@@ -1,5 +1,6 @@
 package dag;
 
+import codegen.OrderByGenerator;
 import common.schema.Schema;
 import common.schema.SchemaSet;
 
@@ -33,7 +34,7 @@ public class OrderByGraphNode extends GraphNode {
 
     @Override
     public String Generate() {
-        return null;
+        return new OrderByGenerator(this).Generate();
     }
 
     public List<Column> GetOrderByKeys() {

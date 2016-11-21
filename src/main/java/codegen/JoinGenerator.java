@@ -99,16 +99,29 @@ public class JoinGenerator {
     }
     public String OutputColumn() {
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (ArithNode anode : node.GetOutputColumns()) {
-            if (!first) {
-                sb.append(" + '|' + ");
+        if (node.GetOutputColumns() == null) {
+            for (int i = 0; i < schema1.size(); ++i) {
+                if (i != 0) {
+                    sb.append(" + '|' + ");
+                }
+                sb.append("arr1[" + i + "]");
             }
-            sb.append("((Object)(");
-            String t = new ArithExpressionGenerator(anode, node.GetInputSchemas(), Arrays.asList("arr1", "arr2")).Generate();
-            sb.append(t);
-            sb.append(")).toString()");
-            first = false;
+            for (int i = 0; i < schema1.size(); ++i) {
+                sb.append(" + '|' + ");
+                sb.append("arr2[" + i + "]");
+            }
+        } else {
+            boolean first = true;
+            for (ArithNode anode : node.GetOutputColumns()) {
+                if (!first) {
+                    sb.append(" + '|' + ");
+                }
+                sb.append("((Object)(");
+                String t = new ArithExpressionGenerator(anode, node.GetInputSchemas(), Arrays.asList("arr1", "arr2")).Generate();
+                sb.append(t);
+                sb.append(")).toString()");
+                first = false;
+            }
         }
         return sb.toString();
     }

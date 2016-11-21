@@ -10,7 +10,7 @@ stat
    ;
 
 select_clause
-   : SELECT column_list FROM table_references ( where_clause )? (groupby_clause)? (orderby_clause)?
+   : SELECT select_column_list FROM table_references ( where_clause )? (groupby_clause)? (orderby_clause)?
    ;
 
 table_name
@@ -27,6 +27,13 @@ column_name
 
 column_list
    : element ( COMMA element )*
+   ;
+
+select_column_list
+   : select_column ( COMMA select_column )*
+   ;
+select_column
+   : element (AS ID)?
    ;
 
 where_clause

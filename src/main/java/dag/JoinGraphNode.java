@@ -1,6 +1,7 @@
 package dag;
 
 import astree.ArithNode;
+import codegen.JoinGenerator;
 import common.schema.Schema;
 
 import java.util.List;
@@ -18,7 +19,15 @@ public class JoinGraphNode extends GraphNode {
 
     @Override
     public Schema GetOutputSchemas() {
-        return null;
+        Schema s = new Schema(output);
+        for (int i = 0; i < outputColumns.size(); ++i) {
+            String cname = outputColumnNames.get(i);
+            if (cname == null) {
+                cname = outputColumns.get(i).GetDefaultName();
+            }
+            s.Add(cname, outputColumns.get(i).GuessReturnType());
+        }
+        return s;
     }
 
     @Override
@@ -33,7 +42,7 @@ public class JoinGraphNode extends GraphNode {
 
     @Override
     public String Generate() {
-        return null;
+        return new JoinGenerator(this).Generate();
     }
 
     public void SetProjection(List<ArithNode> outputColumns, List<String> outputColumnNames) {

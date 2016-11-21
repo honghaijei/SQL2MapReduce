@@ -17,8 +17,8 @@ public abstract class GraphNode {
         }
         return schemas;
     }
-    abstract Schema GetOutputSchemas();
-    abstract List<String> GetInputs();
-    abstract String GetOutput();
-    abstract String Generate();
+    public abstract Schema GetOutputSchemas();
+    public abstract List<String> GetInputs();
+    public abstract String GetOutput();
+    public abstract String Generate();
 }

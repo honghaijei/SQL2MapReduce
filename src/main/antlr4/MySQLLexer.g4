@@ -291,15 +291,15 @@ BY
    ;
 
 AS
-   : 'AS'
+   : 'as'
    ;
 
 ASC
-   : 'ASC'
+   : 'asc'
    ;
 
 DESC
-   : 'DESC'
+   : 'desc'
    ;
 
 FOR
@@ -370,7 +370,7 @@ FLOAT
    ;
 
 STR
-   : '"' .* '"'
+   : '\'' .* '\''
    ;
 
 NEWLINE
