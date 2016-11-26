@@ -7,25 +7,18 @@ import common.schema.SchemaSet;
  * Created by honghaijie on 11/19/16.
  */
 public class Column {
-    public Column(String s) {
+    public Column(String s, SchemaSet set) {
         String[] arr = s.split("\\.");
-        if (arr.length == 1) {
-            key = arr[0];
-            table = SchemaSet.Instance().GetTableNameByColumnName(key);
+        key = arr[0];
+        if (arr.length == 2) {
+            this.table = arr[1];
         } else {
-            table = arr[0];
-            key = arr[1];
+            this.table = set.GetTableNameByColumnName(key);
         }
     }
-    public Column(String s, String table) {
-        String[] arr = s.split("\\.");
-        if (arr.length == 1) {
-            key = arr[0];
-            this.table = table;
-        } else {
-            this.table = arr[0];
-            key = arr[1];
-        }
+    public Column(String key, String table) {
+        this.table = table;
+        this.key = key;
     }
     public void SetTable(String table) {
         this.table = table;

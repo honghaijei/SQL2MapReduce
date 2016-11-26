@@ -1,5 +1,4 @@
 import common.schema.DataType;
-import dag.OrderByGraphNode;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.commons.lang.NotImplementedException;
 import astree.*;
@@ -153,11 +152,12 @@ public class StatVisitor extends MySQLParserBaseVisitor<TreeNode> {
         } else {
             res.constant = ctx.getText();
             if (ctx.FLOAT() != null) {
-                res.type = DataType.DOUBLE;
+                res.type = DataType.DECIMAL;
             } else if (ctx.INT() != null) {
-                res.type = DataType.INT32;
+                res.type = DataType.INTEGER;
             } else if (ctx.STR() != null) {
-                res.type = DataType.STRING;
+                res.type = DataType.TEXT;
+                res.constant = res.constant.replace("'", "\"");
             } else {
                 throw new NotImplementedException();
             }

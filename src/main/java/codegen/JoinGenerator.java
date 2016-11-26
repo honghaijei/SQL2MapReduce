@@ -1,11 +1,13 @@
 package codegen;
 
 import astree.ArithNode;
+import astree.FilterNode;
 import common.schema.DataType;
 import common.schema.Schema;
 import dag.JoinGraphNode;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by honghaijie on 11/15/16.
@@ -37,17 +39,12 @@ public class JoinGenerator {
         return "        private int table = 0;\n" +
                 "        public void setup(Context context) throws IOException, InterruptedException {\n" +
                 "            String path = ((FileSplit)context.getInputSplit()).getPath().toString();\n" +
-                "            if (path.charAt(path.length() - 1) == '/') {\n" +
-                "                path = path.substring(0, path.length() - 1);\n" +
-                "            }\n" +
-                "            String[] d = path.split(\"/\");\n" +
-                "            if (d[d.length - 1].compareTo(\"" + input2 + "\") == 0)\n" +
+                "            if (path.contains(\"" + input2 + "\"))\n" +
                 "                table = 1;\n" +
                 "        }";
     }
     public String JoinMapper() {
         return "    public static class Map extends Mapper<Object,Text, CompositeKey,Text>{\n" +
-                "        private int table = 0;\n" +
                 JoinSetup() +
                 "        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{\n" +
                 "            String line = value.toString();\n" +
@@ -89,13 +86,42 @@ public class JoinGenerator {
                 "                    rightTuples.add(arr[1].split(\"\\\\|\"));\n" +
                 "                }\n" +
                 "            }\n" +
-                "            for (String[] i : leftTuples) {\n" +
-                "                for (String[] j : rightTuples) {\n" +
-                "                    context.write(t, new Text(" + OutputColumn() + "));\n" +
+                "            for (String[] arr1 : leftTuples) {\n" +
+                "                for (String[] arr2 : rightTuples) {\n" +
+                ReducerFilter() +
                 "                }\n" +
                 "            }\n" +
                 "        }\n" +
                 "    }";
+    }
+    public String ReducerFilter() {
+        if (node.GetReducerFilter() == null) {
+            return "                    context.write(t, new Text(" + OutputColumn() + "));\n";
+        }
+        return "                    String[] arr = new String[]{" +
+                OutputColumnArr() +
+                "};\n" +
+                "                    if (" +
+                new WhereGenerator(node.GetReducerFilter(), Arrays.asList(node.GetOutputSchema())).Generate() +
+                ") {\n" +
+                "                        context.write(t, new Text(String.join(\"|\", arr)));\n" +
+                "                    }";
+    }
+    public String OutputColumnArr() {
+        StringBuilder sb = new StringBuilder();
+        if (node.GetOutputColumns() == null) {
+            for (int i = 0; i < schema1.size(); ++i) {
+                if (i != 0) {
+                    sb.append(",");
+                }
+                sb.append("arr1[" + i + "]");
+            }
+            for (int i = 0; i < schema2.size(); ++i) {
+                sb.append(",");
+                sb.append("arr2[" + i + "]");
+            }
+        }
+        return sb.toString();
     }
     public String OutputColumn() {
         StringBuilder sb = new StringBuilder();
@@ -106,7 +132,7 @@ public class JoinGenerator {
                 }
                 sb.append("arr1[" + i + "]");
             }
-            for (int i = 0; i < schema1.size(); ++i) {
+            for (int i = 0; i < schema2.size(); ++i) {
                 sb.append(" + '|' + ");
                 sb.append("arr2[" + i + "]");
             }
@@ -117,7 +143,7 @@ public class JoinGenerator {
                     sb.append(" + '|' + ");
                 }
                 sb.append("((Object)(");
-                String t = new ArithExpressionGenerator(anode, node.GetInputSchemas(), Arrays.asList("arr1", "arr2")).Generate();
+                String t = new ArithExpressionGenerator(anode, node.GetInputSchemas(), Arrays.asList("arr")).Generate();
                 sb.append(t);
                 sb.append(")).toString()");
                 first = false;

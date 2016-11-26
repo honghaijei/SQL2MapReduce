@@ -80,13 +80,13 @@ public class AggrFunction {
     }
     private boolean AggrFunctionInputCheck(FunctionType func, List<DataType> input) {
         if (func == FunctionType.SUM) {
-            return input.size() == 1 && (input.get(0) == DataType.DOUBLE || input.get(0) == DataType.INT32);
+            return input.size() == 1 && (input.get(0) == DataType.DECIMAL || input.get(0) == DataType.INTEGER);
         } else if (func == FunctionType.AVG) {
-            return input.size() == 1 && (input.get(0) == DataType.DOUBLE || input.get(0) == DataType.INT32);
+            return input.size() == 1 && (input.get(0) == DataType.DECIMAL || input.get(0) == DataType.INTEGER);
         } else if (func == FunctionType.MIN) {
-            return input.size() == 1 && (input.get(0) == DataType.DOUBLE || input.get(0) == DataType.INT32);
+            return input.size() == 1 && (input.get(0) == DataType.DECIMAL || input.get(0) == DataType.INTEGER);
         } else if (func == FunctionType.MAX) {
-            return input.size() == 1 && (input.get(0) == DataType.DOUBLE || input.get(0) == DataType.INT32);
+            return input.size() == 1 && (input.get(0) == DataType.DECIMAL || input.get(0) == DataType.INTEGER);
         } else {
             throw new NotImplementedException();
         }

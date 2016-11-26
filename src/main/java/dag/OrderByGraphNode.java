@@ -1,5 +1,7 @@
 package dag;
 
+import astree.FilterNode;
+import astree.TreeNode;
 import codegen.OrderByGenerator;
 import common.schema.Schema;
 import common.schema.SchemaSet;
@@ -18,7 +20,12 @@ public class OrderByGraphNode extends GraphNode {
     }
 
     @Override
-    public Schema GetOutputSchemas() {
+    public List<Schema> GetMapperOutputSchema() {
+        return this.GetInputSchemas();
+    }
+
+    @Override
+    public Schema GetOutputSchema() {
         return SchemaSet.Instance().Get(input);
     }
 
@@ -37,6 +44,26 @@ public class OrderByGraphNode extends GraphNode {
         return new OrderByGenerator(this).Generate();
     }
 
+    @Override
+    public void AddMapperFilter(List<TreeNode> filters) {
+        this.mapperFilters = filters;
+    }
+
+    @Override
+    public void AddReducerFilter(TreeNode filters) {
+        this.reducerFilters = filters;
+    }
+
+    @Override
+    public List<TreeNode> GetMapperFilter() {
+        return mapperFilters;
+    }
+
+    @Override
+    public TreeNode GetReducerFilter() {
+        return reducerFilters;
+    }
+
     public List<Column> GetOrderByKeys() {
         return orderByKeys;
     }
@@ -44,4 +71,7 @@ public class OrderByGraphNode extends GraphNode {
     private String input;
     private String output;
     private List<Column> orderByKeys;
+
+    private List<TreeNode> mapperFilters;
+    private TreeNode reducerFilters;
 }

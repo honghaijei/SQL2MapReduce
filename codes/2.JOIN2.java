@@ -1,7 +1,6 @@
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
@@ -10,6 +9,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
 public class Main {
     public static String[] Split(String s, char seperator, int expected_length) {
         String[] code = new String[expected_length];
@@ -24,7 +27,7 @@ public class Main {
         return code;
     }    public static class CompositeKey implements WritableComparable<CompositeKey> {
         public CompositeKey() {}
-        public CompositeKey(String k0) {
+        public CompositeKey(Integer k0) {
             this.k0= k0;
         }
         public int compareTo(CompositeKey y) {
@@ -35,32 +38,27 @@ public class Main {
             }
         }
         public void write(DataOutput dataOutput) throws IOException {
-            dataOutput.writeUTF(k0);
+            dataOutput.writeInt(k0);
         }
         public void readFields(DataInput dataInput) throws IOException {
-            k0=dataInput.readUTF();
+            k0=dataInput.readInt();
         }
-        public String k0;
+        public Integer k0;
     }
     public static class Map extends Mapper<Object,Text, CompositeKey,Text>{
         private int table = 0;
-        private int table = 0;
         public void setup(Context context) throws IOException, InterruptedException {
             String path = ((FileSplit)context.getInputSplit()).getPath().toString();
-            if (path.charAt(path.length() - 1) == '/') {
-                path = path.substring(0, path.length() - 1);
-            }
-            String[] d = path.split("/");
-            if (d[d.length - 1].compareTo("JOIN1") == 0)
+            if (path.contains("orders"))
                 table = 1;
         }        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
             String line = value.toString();
             if (table == 0) {
-                String[] arr = Split(line, '|',  4);
-                context.write(new CompositeKey(arr[0]), new Text(table + "|" + line));
+                String[] arr = Split(line, '|',  12);
+                context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
             } else {
-                String[] arr = Split(line, '|', 10);
-                context.write(new CompositeKey(arr[9]), new Text(table + "|" + line));
+                String[] arr = Split(line, '|', 9);
+                context.write(new CompositeKey(Integer.parseInt(arr[1])), new Text(table + "|" + line));
             }
         }
     }    public static class Reduce extends Reducer<CompositeKey,Text,NullWritable,Text>{
@@ -79,9 +77,9 @@ public class Main {
                     rightTuples.add(arr[1].split("\\|"));
                 }
             }
-            for (String[] i : leftTuples) {
-                for (String[] j : rightTuples) {
-                    context.write(t, new Text(arr1[0] + '|' + arr1[1] + '|' + arr1[2] + '|' + arr1[3] + '|' + arr2[0] + '|' + arr2[1] + '|' + arr2[2] + '|' + arr2[3]));
+            for (String[] arr1 : leftTuples) {
+                for (String[] arr2 : rightTuples) {
+                    context.write(t, new Text(arr1[0] + '|' + arr1[1] + '|' + arr1[2] + '|' + arr1[3] + '|' + arr1[4] + '|' + arr1[5] + '|' + arr1[6] + '|' + arr1[7] + '|' + arr1[8] + '|' + arr1[9] + '|' + arr1[10] + '|' + arr1[11] + '|' + arr2[0] + '|' + arr2[1] + '|' + arr2[2] + '|' + arr2[3] + '|' + arr2[4] + '|' + arr2[5] + '|' + arr2[6] + '|' + arr2[7] + '|' + arr2[8]));
                 }
             }
         }
@@ -93,8 +91,8 @@ public class Main {
         job.setReducerClass(Reduce.class);
         job.setMapOutputKeyClass(CompositeKey.class);
         job.setOutputValueClass(Text.class);
-        FileInputFormat.addInputPath(job, new Path("lineitem"));
         FileInputFormat.addInputPath(job, new Path("JOIN1"));
+        FileInputFormat.addInputPath(job, new Path("orders"));
         FileOutputFormat.setOutputPath(job, new Path("JOIN2"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }}

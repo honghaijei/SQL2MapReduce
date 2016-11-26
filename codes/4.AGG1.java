@@ -1,7 +1,6 @@
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
@@ -10,6 +9,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
 public class Main {
     public static String[] Split(String s, char seperator, int expected_length) {
         String[] code = new String[expected_length];
@@ -24,7 +27,7 @@ public class Main {
         return code;
     }    public static class CompositeKey implements WritableComparable<CompositeKey> {
         public CompositeKey() {}
-        public CompositeKey(String k0, String k1, String k2, String k3, String k4, String k5, String k6) {
+        public CompositeKey(Integer k0, String k1, Double k2, String k3, String k4, String k5, String k6) {
             this.k0= k0;
             this.k1= k1;
             this.k2= k2;
@@ -65,26 +68,26 @@ public class Main {
             }
         }
         public void write(DataOutput dataOutput) throws IOException {
-            dataOutput.writeUTF(k0);
+            dataOutput.writeInt(k0);
             dataOutput.writeUTF(k1);
-            dataOutput.writeUTF(k2);
+            dataOutput.writeDouble(k2);
             dataOutput.writeUTF(k3);
             dataOutput.writeUTF(k4);
             dataOutput.writeUTF(k5);
             dataOutput.writeUTF(k6);
         }
         public void readFields(DataInput dataInput) throws IOException {
-            k0=dataInput.readUTF();
+            k0=dataInput.readInt();
             k1=dataInput.readUTF();
-            k2=dataInput.readUTF();
+            k2=dataInput.readDouble();
             k3=dataInput.readUTF();
             k4=dataInput.readUTF();
             k5=dataInput.readUTF();
             k6=dataInput.readUTF();
         }
-        public String k0;
+        public Integer k0;
         public String k1;
-        public String k2;
+        public Double k2;
         public String k3;
         public String k4;
         public String k5;
@@ -93,8 +96,8 @@ public class Main {
     public static class Map extends Mapper<Object,Text, CompositeKey,Text>{
         public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
             String line = value.toString();
-            String[] arr = Split(line, '|', 16);
-            context.write(new CompositeKey(arr[4], arr[5], arr[6], arr[8], arr[15], arr[7], arr[9]), new Text(line));
+            String[] arr = Split(line, '|', 37);
+            context.write(new CompositeKey(Integer.parseInt(arr[16]), arr[17], Double.parseDouble(arr[21]), arr[20], arr[25], arr[18], arr[23]), new Text(line));
         }
     }
     public static class Reduce extends Reducer<CompositeKey,Text,NullWritable,Text>{
@@ -104,11 +107,11 @@ public class Main {
             int count = 0;
             String[] arr = null;
             for (Text value : values) {
-                arr = Split(value.toString(), '|', 16);
+                arr = Split(value.toString(), '|', 37);
                 ++count;
-                agg0 += Double.parseDouble(arr[2])*(1-Double.parseDouble(arr[3]));
+                agg0 += Double.parseDouble(arr[5])*(1-Double.parseDouble(arr[6]));
             }
-                        context.write(t, new Text(((Object)(arr[4])).toString())+"|"+((Object)(arr[5])).toString())+"|"+((Object)(agg0)).toString())+"|"+((Object)(arr[6])).toString())+"|"+((Object)(arr[15])).toString())+"|"+((Object)(arr[7])).toString())+"|"+((Object)(arr[8])).toString())+"|"+((Object)(arr[9])).toString()));
+                        context.write(t, new Text(((Object)(Integer.parseInt(arr[16]))).toString()+"|"+((Object)(arr[17])).toString()+"|"+((Object)(agg0)).toString()+"|"+((Object)(Double.parseDouble(arr[21]))).toString()+"|"+((Object)(arr[25])).toString()+"|"+((Object)(arr[18])).toString()+"|"+((Object)(arr[20])).toString()+"|"+((Object)(arr[23])).toString()));
         }
     }
     public static void main(String[] args) throws Exception{

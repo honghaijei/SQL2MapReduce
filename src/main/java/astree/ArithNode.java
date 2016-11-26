@@ -9,8 +9,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static common.Utils.GetSchemaIdxByColumnName;
-
 /**
  * Created by honghaijie on 11/8/16.
  */
@@ -50,23 +48,23 @@ public class ArithNode extends TreeNode {
         }
         DataType retType = inputTypes.get(0);
         for (int i = 1; i < inputTypes.size(); ++i) {
-            if (retType == DataType.INT32) {
-                if (inputTypes.get(i) == DataType.DOUBLE) {
-                    retType = DataType.DOUBLE;
-                } else if (inputTypes.get(i) == DataType.INT32) {
-                    retType = DataType.INT32;
+            if (retType == DataType.INTEGER) {
+                if (inputTypes.get(i) == DataType.DECIMAL) {
+                    retType = DataType.DECIMAL;
+                } else if (inputTypes.get(i) == DataType.INTEGER) {
+                    retType = DataType.INTEGER;
                 } else {
                     throw new NotImplementedException();
                 }
-            } else if (retType == DataType.DOUBLE) {
-                if (inputTypes.get(i) == DataType.INT32 || inputTypes.get(i) == DataType.DOUBLE) {
-                    retType = DataType.DOUBLE;
+            } else if (retType == DataType.DECIMAL) {
+                if (inputTypes.get(i) == DataType.INTEGER || inputTypes.get(i) == DataType.DECIMAL) {
+                    retType = DataType.DECIMAL;
                 } else {
                     throw new NotImplementedException();
                 }
-            } else if (retType == DataType.STRING) {
-                if (inputTypes.get(i) == DataType.STRING) {
-                    retType = DataType.STRING;
+            } else if (retType == DataType.TEXT) {
+                if (inputTypes.get(i) == DataType.TEXT) {
+                    retType = DataType.TEXT;
                 } else {
                     throw new NotImplementedException();
                 }

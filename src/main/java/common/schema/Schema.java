@@ -13,28 +13,16 @@ public class Schema {
     public String Name() {
         return tableName;
     }
-    public void Add(String name, DataType type) {
-        cols.add(new SchemaColumn(name, type));
+    public void Add(String name, DataType type, String tableName) {
+        cols.add(new SchemaColumn(name, type, tableName));
     }
     public SchemaColumn Get(int i) {
         return cols.get(i);
     }
     public int GetPosByName(String name) {
-        String[] arr = name.split("\\.");
-        String qtable = null;
-        String qcol = null;
-        if (arr.length > 1) {
-            qtable = arr[0];
-            qcol = arr[1];
-        } else {
-            qcol = arr[0];
-        }
-        if (qtable != null && !qtable.equals(this.tableName)) {
-            return -1;
-        }
         int ret = 0;
         for (SchemaColumn sc : cols) {
-            if (sc.name.equals(qcol)) {
+            if (sc.Match(name)) {
                 return ret;
             }
             ++ret;
@@ -48,8 +36,14 @@ public class Schema {
         return this.cols;
     }
     public static Schema ParseFromString(String raw) {
-        // TODO
-        return new Schema("");
+        String[] p = raw.split("\\|");
+        String tableName = p[0].toLowerCase();
+        Schema res = new Schema(tableName);
+        for (int i = 1; i < p.length; ++i) {
+            String[] c = p[i].split(":");
+            res.Add(c[0].toLowerCase(), DataType.valueOf(c[1]), tableName);
+        }
+        return res;
     }
     public static Schema Combine(String name, Schema schema1, Schema schema2) {
         Schema ans = new Schema(name);

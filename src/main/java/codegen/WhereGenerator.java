@@ -30,6 +30,18 @@ public class WhereGenerator {
             if (sfn.op.equals("!=")) {
                 return "!" + GenerateExperssion(sfn.left) + ".equals(" + GenerateExperssion(sfn.right) + ")";
             }
+            if (sfn.op.equals(">")) {
+                return GenerateExperssion(sfn.left) + ".compareTo(" + GenerateExperssion(sfn.right) + ") > 0";
+            }
+            if (sfn.op.equals("<")) {
+                return GenerateExperssion(sfn.left) + ".compareTo(" + GenerateExperssion(sfn.right) + ") < 0";
+            }
+            if (sfn.op.equals(">=")) {
+                return GenerateExperssion(sfn.left) + ".compareTo(" + GenerateExperssion(sfn.right) + ") >= 0";
+            }
+            if (sfn.op.equals("<=")) {
+                return GenerateExperssion(sfn.left) + ".compareTo(" + GenerateExperssion(sfn.right) + ") <= 0";
+            }
 
             return GenerateExperssion(sfn.left) + sfn.op + GenerateExperssion(sfn.right);
         }

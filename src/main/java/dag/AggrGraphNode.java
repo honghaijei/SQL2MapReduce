@@ -1,6 +1,8 @@
 package dag;
 
 import astree.ArithNode;
+import astree.FilterNode;
+import astree.TreeNode;
 import codegen.AggrGenerator;
 import common.schema.Schema;
 
@@ -18,11 +20,16 @@ public class AggrGraphNode extends GraphNode {
         this.output = output;
         this.outputColumns = outputColumns;
         this.outputColumnNames = outputColumnNames;
-        GetOutputSchemas();
+        GetOutputSchema();
     }
 
     @Override
-    public Schema GetOutputSchemas() {
+    public List<Schema> GetMapperOutputSchema() {
+        return this.GetInputSchemas();
+    }
+
+    @Override
+    public Schema GetOutputSchema() {
         Schema inputSchema = GetInputSchemas().get(0);
         Schema ans = new Schema(output);
         int i = 0;
@@ -34,7 +41,7 @@ public class AggrGraphNode extends GraphNode {
             if (cname == null) {
                 cname = node.GetDefaultName();
             }
-            ans.Add(cname, node.GuessReturnType());
+            ans.Add(cname, node.GuessReturnType(), output);
             ++i;
         }
         return ans;
@@ -55,6 +62,26 @@ public class AggrGraphNode extends GraphNode {
         return new AggrGenerator(this).Generate();
     }
 
+    @Override
+    public void AddMapperFilter(List<TreeNode> filters) {
+        this.mapperFilters = filters;
+    }
+
+    @Override
+    public void AddReducerFilter(TreeNode filters) {
+        this.reducerFilters = filters;
+    }
+
+    @Override
+    public List<TreeNode> GetMapperFilter() {
+        return mapperFilters;
+    }
+
+    @Override
+    public TreeNode GetReducerFilter() {
+        return reducerFilters;
+    }
+
     public List<String> GetGroupByKeys() {
         List<String> ans = new ArrayList<>();
         for (Column c : groupByKeys) {
@@ -72,4 +99,6 @@ public class AggrGraphNode extends GraphNode {
     private List<Column> groupByKeys;
     private List<ArithNode> outputColumns;
     private List<String> outputColumnNames;
+    private List<TreeNode> mapperFilters;
+    private TreeNode reducerFilters;
 }

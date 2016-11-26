@@ -3,56 +3,54 @@ package codegen;
 import common.schema.DataType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.xml.crypto.Data;
-
 /**
  * Created by honghaijie on 11/11/16.
  */
 public class Helper {
     public static String DataType2JavaType(DataType type) {
-        if (type == DataType.INT32) {
+        if (type == DataType.INTEGER) {
             return "Integer";
         }
-        if (type == DataType.DOUBLE) {
+        if (type == DataType.DECIMAL) {
             return "Double";
         }
-        if (type == DataType.STRING) {
+        if (type == DataType.TEXT) {
             return "String";
         }
         throw new NotImplementedException();
     }
     public static String DefaultValue(DataType type) {
-        if (type == DataType.DOUBLE) {
+        if (type == DataType.DECIMAL) {
             return "0.0";
         }
-        if (type == DataType.INT32) {
+        if (type == DataType.INTEGER) {
             return "0";
         }
-        if (type == DataType.STRING) {
+        if (type == DataType.TEXT) {
             return "";
         }
         throw new NotImplementedException();
     }
     public static String DataType2MapReduceType(DataType type) {
-        if (type == DataType.INT32) {
+        if (type == DataType.INTEGER) {
             return "IntWritable";
         }
-        if (type == DataType.DOUBLE) {
+        if (type == DataType.DECIMAL) {
             return "DoubleWritable";
         }
-        if (type == DataType.STRING) {
+        if (type == DataType.TEXT) {
             return "Text";
         }
         throw new NotImplementedException();
     }
     public static String ParseString2JavaType(String var, DataType type) {
-        if (type == DataType.INT32) {
+        if (type == DataType.INTEGER) {
             return "Integer.parseInt(" + var + ")";
         }
-        if (type == DataType.DOUBLE) {
+        if (type == DataType.DECIMAL) {
             return "Double.parseDouble(" + var + ")";
         }
-        if (type == DataType.STRING) {
+        if (type == DataType.TEXT) {
             return var;
         }
         throw new NotImplementedException();
@@ -67,7 +65,6 @@ public class Helper {
     public static String Import = "import java.io.DataInput;\n" +
             "import java.io.DataOutput;\n" +
             "import java.io.IOException;\n" +
-            "\n" +
             "import org.apache.hadoop.fs.Path;\n" +
             "import org.apache.hadoop.conf.*;\n" +
             "import org.apache.hadoop.io.*;\n" +
@@ -75,7 +72,11 @@ public class Helper {
             "import org.apache.hadoop.mapreduce.Mapper;\n" +
             "import org.apache.hadoop.mapreduce.Reducer;\n" +
             "import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;\n" +
-            "import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;\n";
+            "import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;\n" +
+            "import java.util.ArrayList;\n"+
+            "import java.util.List;\n"+
+            "import org.apache.hadoop.mapreduce.lib.input.FileSplit;\n" +
+            "\n";
 
     public static String SplitFunction = "    public static String[] Split(String s, char seperator, int expected_length) {\n" +
             "        String[] code = new String[expected_length];\n" +

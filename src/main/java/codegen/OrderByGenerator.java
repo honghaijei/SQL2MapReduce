@@ -89,14 +89,4 @@ public class OrderByGenerator {
     private String input;
     private String output;
 
-    public static void main(String[] args) {
-        Schema s = new Schema("");
-        s.Add("Name", DataType.STRING);
-        s.Add("Age", DataType.INT32);
-        s.Add("Height", DataType.DOUBLE);
-
-        OrderByNode node = new OrderByNode();
-        node.cols.add("Name");
-        //System.out.println(new OrderByGenerator(node).Generate());
-    }
 }

@@ -1,5 +1,7 @@
 package dag;
 
+import astree.FilterNode;
+import astree.TreeNode;
 import common.schema.Schema;
 import common.schema.SchemaSet;
 
@@ -17,8 +19,13 @@ public abstract class GraphNode {
         }
         return schemas;
     }
-    public abstract Schema GetOutputSchemas();
+    public abstract List<Schema> GetMapperOutputSchema();
+    public abstract Schema GetOutputSchema();
     public abstract List<String> GetInputs();
     public abstract String GetOutput();
     public abstract String Generate();
+    public abstract void AddMapperFilter(List<TreeNode> filters);
+    public abstract void AddReducerFilter(TreeNode filters);
+    public abstract List<TreeNode>  GetMapperFilter();
+    public abstract TreeNode GetReducerFilter();
 }

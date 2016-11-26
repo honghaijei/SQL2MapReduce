@@ -2,7 +2,6 @@ package codegen;
 
 import common.schema.DataType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import codegen.Helper;
 
 /**
  * Created by honghaijie on 11/12/16.
@@ -59,11 +58,11 @@ public class CompositeKeyGenerator {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < types.length; ++i) {
             sb.append("            dataOutput.write");
-            if (types[i] == DataType.INT32) {
+            if (types[i] == DataType.INTEGER) {
                 sb.append("Int(");
-            } else if (types[i] == DataType.STRING) {
+            } else if (types[i] == DataType.TEXT) {
                 sb.append("UTF(");
-            } else if (types[i] == DataType.DOUBLE) {
+            } else if (types[i] == DataType.DECIMAL) {
                 sb.append("Double(");
             } else {
                 throw new NotImplementedException();
@@ -76,11 +75,11 @@ public class CompositeKeyGenerator {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < types.length; ++i) {
             sb.append("            k" + i + "=dataInput.read");
-            if (types[i] == DataType.INT32) {
+            if (types[i] == DataType.INTEGER) {
                 sb.append("Int(");
-            } else if (types[i] == DataType.STRING) {
+            } else if (types[i] == DataType.TEXT) {
                 sb.append("UTF(");
-            } else if (types[i] == DataType.DOUBLE) {
+            } else if (types[i] == DataType.DECIMAL) {
                 sb.append("Double(");
             } else {
                 throw new NotImplementedException();

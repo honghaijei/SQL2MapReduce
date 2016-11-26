@@ -1,6 +1,8 @@
 package dag;
 
 import astree.ArithNode;
+import astree.FilterNode;
+import astree.TreeNode;
 import codegen.JoinGenerator;
 import common.schema.Schema;
 
@@ -18,14 +20,24 @@ public class JoinGraphNode extends GraphNode {
     }
 
     @Override
-    public Schema GetOutputSchemas() {
+    public List<Schema> GetMapperOutputSchema() {
+        return this.GetInputSchemas();
+    }
+
+    @Override
+    public Schema GetOutputSchema() {
         Schema s = new Schema(output);
-        for (int i = 0; i < outputColumns.size(); ++i) {
-            String cname = outputColumnNames.get(i);
-            if (cname == null) {
-                cname = outputColumns.get(i).GetDefaultName();
+        if (outputColumns == null) {
+            List<Schema> schemas = this.GetInputSchemas();
+            return Schema.Combine(output, schemas.get(0), schemas.get(1));
+        } else {
+            for (int i = 0; i < outputColumns.size(); ++i) {
+                String cname = outputColumnNames.get(i);
+                if (cname == null) {
+                    cname = outputColumns.get(i).GetDefaultName();
+                }
+                s.Add(cname, outputColumns.get(i).GuessReturnType(), output);
             }
-            s.Add(cname, outputColumns.get(i).GuessReturnType());
         }
         return s;
     }
@@ -43,6 +55,26 @@ public class JoinGraphNode extends GraphNode {
     @Override
     public String Generate() {
         return new JoinGenerator(this).Generate();
+    }
+
+    @Override
+    public void AddMapperFilter(List<TreeNode> filters) {
+        this.mapperFilters = filters;
+    }
+
+    @Override
+    public void AddReducerFilter(TreeNode filters) {
+        this.reducerFilters = filters;
+    }
+
+    @Override
+    public List<TreeNode> GetMapperFilter() {
+        return this.mapperFilters;
+    }
+
+    @Override
+    public TreeNode GetReducerFilter() {
+        return this.reducerFilters;
     }
 
     public void SetProjection(List<ArithNode> outputColumns, List<String> outputColumnNames) {
@@ -69,4 +101,7 @@ public class JoinGraphNode extends GraphNode {
 
     private List<ArithNode> outputColumns;
     private List<String> outputColumnNames;
+
+    private List<TreeNode> mapperFilters;
+    private TreeNode reducerFilters;
 }

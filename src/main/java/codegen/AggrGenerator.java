@@ -111,9 +111,9 @@ public class AggrGenerator {
             if (i != 0) {
                 sb.append("+\"|\"+");
             }
-            sb.append("((Object)(" + aeg.Generate() + ")).toString())");
+            sb.append("((Object)(" + aeg.Generate() + ")).toString()");
         }
-        sb.append(");\n");
+        sb.append("));\n");
         sb.append("        }\n");
         sb.append("    }\n");
         return sb.toString();

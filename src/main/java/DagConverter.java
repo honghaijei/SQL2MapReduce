@@ -2,7 +2,6 @@ import astree.*;
 import common.UnionFindSet;
 import common.Utils;
 import common.schema.Schema;
-import common.schema.SchemaColumn;
 import common.schema.SchemaSet;
 import dag.*;
 
@@ -15,39 +14,48 @@ public class DagConverter {
     public DagConverter() {
 
     }
-    public List<SimpleFilterNode> GetEquiFilters(TreeNode filterNode) {
+    public List<SimpleFilterNode> GetEquiFilters(SelectNode selectNode) {
+        TreeNode filterNode = selectNode.where;
         List<SimpleFilterNode> ans = new ArrayList<>();
         if (filterNode instanceof FilterNode) {
             if (!((FilterNode) filterNode).IsAnd()) {
                 return ans;
             }
+            FilterNode left = new FilterNode();
+            left.op = "&&";
             for (TreeNode filter : ((FilterNode) filterNode).filters) {
                 if (filter instanceof SimpleFilterNode) {
                     if (((SimpleFilterNode) filter).IsEqui() &&
                             ((SimpleFilterNode) filter).left.IsColumn() &&
                             ((SimpleFilterNode) filter).right.IsColumn()) {
                         ans.add((SimpleFilterNode) filter);
+                    } else {
+                        left.filters.add(filter);
                     }
                 }
             }
+            selectNode.where = left;
         } else if (filterNode instanceof SimpleFilterNode) {
             if (((SimpleFilterNode) filterNode).IsEqui() &&
                     ((SimpleFilterNode) filterNode).left.IsColumn() &&
                     ((SimpleFilterNode) filterNode).right.IsColumn()) {
+                selectNode.where = null;
                 ans.add((SimpleFilterNode) filterNode);
             }
             return ans;
         }
         return ans;
     }
-    public String GenerateJoinTree(List<SimpleFilterNode> eqs, List<String> tables) {
+    public String GenerateJoinTree(List<SimpleFilterNode> eqs, List<String> tables, TreeNode noeqs) {
         Set<String> tableSet = new HashSet<>(tables);
         UnionFindSet<String> ufs = new UnionFindSet();
         Map<String, JoinGraphNode> msj = new HashMap<>();
         JoinGraphNode ans = null;
+        SchemaSet curSet = SchemaSet.Instance().SubSet(tables);
         for (SimpleFilterNode eq : eqs) {
-            Column c1 = new Column(eq.left.columnName);
-            Column c2 = new Column(eq.right.columnName);
+            Column c1 = new Column(eq.left.columnName, curSet);
+            Column c2 = new Column(eq.right.columnName, curSet);
+
             if (!tableSet.contains(c1.GetTable()) || !tableSet.contains(c2.GetTable())) {
                 continue;
             }
@@ -68,6 +76,7 @@ public class DagConverter {
             msj.put(newTableName, jgn);
             ans = jgn;
         }
+        ans.AddReducerFilter(noeqs);
         return ans.GetOutput();
     }
     public String Convert(SelectNode node) {
@@ -81,12 +90,12 @@ public class DagConverter {
         String inputTable = null;
         boolean join = node.from.size() > 1;
         if (join) {
-            List<SimpleFilterNode> eqs = GetEquiFilters(node.where);
+            List<SimpleFilterNode> eqs = GetEquiFilters(node);
             List<String> tablenames = new ArrayList<>();
             for (TableNode tnode : node.from) {
                 tablenames.add(tnode.GetName());
             }
-            inputTable = GenerateJoinTree(eqs, tablenames);
+            inputTable = GenerateJoinTree(eqs, tablenames, node.where);
         } else {
             inputTable = node.from.get(0).GetName();
         }
@@ -98,7 +107,7 @@ public class DagConverter {
             String newTable = Utils.GetTaskName("AGG");
             AggrGraphNode aggrNode = new AggrGraphNode(groupByKeys, node.columns, null, inputTable, newTable);
             inputTable = newTable;
-            SchemaSet.Instance().Add(aggrNode.GetOutputSchemas());
+            SchemaSet.Instance().Add(aggrNode.GetOutputSchema());
             nodes.add(aggrNode);
         }
         if (node.orderby != null) {
@@ -108,7 +117,7 @@ public class DagConverter {
             }
             String newTable = Utils.GetTaskName("SORT");
             OrderByGraphNode sortNode = new OrderByGraphNode(orderByKeys, inputTable, newTable);
-            SchemaSet.Instance().Add(sortNode.GetOutputSchemas());
+            SchemaSet.Instance().Add(sortNode.GetOutputSchema());
             nodes.add(sortNode);
         }
         return inputTable;
