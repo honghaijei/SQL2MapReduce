@@ -19,6 +19,7 @@ public abstract class GraphNode {
         }
         return schemas;
     }
+    public abstract String GetName();
     public abstract List<Schema> GetMapperOutputSchema();
     public abstract Schema GetOutputSchema();
     public abstract List<String> GetInputs();

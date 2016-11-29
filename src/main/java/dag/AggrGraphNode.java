@@ -14,13 +14,19 @@ import java.util.List;
  * Created by honghaijie on 11/19/16.
  */
 public class AggrGraphNode extends GraphNode {
-    public AggrGraphNode(List<Column> groupByKeys, List<ArithNode> outputColumns, List<String> outputColumnNames, String input, String output) {
+    public AggrGraphNode(String name, List<Column> groupByKeys, List<ArithNode> outputColumns, List<String> outputColumnNames, String input, String output) {
         this.groupByKeys = groupByKeys;
         this.input = input;
         this.output = output;
         this.outputColumns = outputColumns;
         this.outputColumnNames = outputColumnNames;
+        this.name = name;
         GetOutputSchema();
+    }
+
+    @Override
+    public String GetName() {
+        return this.name;
     }
 
     @Override
@@ -101,4 +107,5 @@ public class AggrGraphNode extends GraphNode {
     private List<String> outputColumnNames;
     private List<TreeNode> mapperFilters;
     private TreeNode reducerFilters;
+    private String name;
 }

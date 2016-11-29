@@ -90,4 +90,14 @@ public class Helper {
             "        };\n" +
             "        return code;\n" +
             "    }";
+    public static String JoinFunction = "    public static String Join(String sep, String[] arr) {\n" +
+            "        StringBuilder sb = new StringBuilder();\n" +
+            "        for (int i = 0; i < arr.length; ++i) {\n" +
+            "            if (i != 0) {\n" +
+            "                sb.append(sep);\n" +
+            "            }\n" +
+            "            sb.append(arr[i]);\n" +
+            "        }\n" +
+            "        return sb.toString();\n" +
+            "    }";
 }

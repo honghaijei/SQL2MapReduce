@@ -6,11 +6,14 @@ import astree.OrderByNode;
 import dag.Column;
 import dag.OrderByGraphNode;
 
+import static codegen.Helper.JoinFunction;
+
 /**
  * Created by honghaijie on 11/11/16.
  */
 public class OrderByGenerator {
     public OrderByGenerator(OrderByGraphNode node) {
+        this.node = node;
         this.schema = node.GetInputSchemas().get(0);
         this.input = node.GetInputs().get(0);
         this.output = node.GetOutput();
@@ -26,7 +29,9 @@ public class OrderByGenerator {
     }
     public String Generate() {
         return Helper.Import +
-                "public class Main {\n" +
+                "public class " + this.node.GetName() + " {\n" +
+                Helper.JoinFunction +
+                Helper.SplitFunction +
                 new CompositeKeyGenerator(orderByColTypes).Generate() +
                 OrderByMapper() +
                 OrderByReducer() +
@@ -36,7 +41,6 @@ public class OrderByGenerator {
     }
     String OrderByMapper() {
         return "    public static class Map extends Mapper<Object,Text, CompositeKey,Text>{\n" +
-                Helper.SplitFunction +
                 "        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{\n" +
                 "            String line = value.toString();\n" +
                 "            String[] arr = Split(line, '|', " + schema.size() + ");\n" +
@@ -71,7 +75,7 @@ public class OrderByGenerator {
         return "    public static void main(String[] args) throws Exception{\n" +
                 "        Configuration conf = new Configuration();\n" +
                 "        Job job = new Job(conf,\"Sort\");\n" +
-                "        job.setJarByClass(Main.class);\n" +
+                "        job.setJarByClass(" + this.node.GetName() + ".class);\n" +
                 "        job.setMapperClass(Map.class);\n" +
                 "        job.setReducerClass(Reduce.class);\n" +
                 "        job.setMapOutputKeyClass(CompositeKey.class);\n" +
@@ -88,5 +92,5 @@ public class OrderByGenerator {
     private DataType[] orderByColTypes;
     private String input;
     private String output;
-
+    private OrderByGraphNode node;
 }

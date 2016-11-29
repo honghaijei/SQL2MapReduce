@@ -13,10 +13,16 @@ import java.util.List;
  * Created by honghaijie on 11/19/16.
  */
 public class OrderByGraphNode extends GraphNode {
-    public OrderByGraphNode(List<Column> orderByKeys, String input, String output) {
+    public OrderByGraphNode(String name, List<Column> orderByKeys, String input, String output) {
         this.input = input;
         this.output = output;
         this.orderByKeys = orderByKeys;
+        this.name = name;
+    }
+
+    @Override
+    public String GetName() {
+        return this.name;
     }
 
     @Override
@@ -74,4 +80,6 @@ public class OrderByGraphNode extends GraphNode {
 
     private List<TreeNode> mapperFilters;
     private TreeNode reducerFilters;
+
+    private String name;
 }

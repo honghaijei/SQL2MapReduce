@@ -12,11 +12,17 @@ import java.util.List;
  * Created by honghaijie on 11/19/16.
  */
 public class JoinGraphNode extends GraphNode {
-    public JoinGraphNode(String key1, String key2, List<String> input, String output) {
+    public JoinGraphNode(String name, String key1, String key2, List<String> input, String output) {
         this.key1 = key1;
         this.key2 = key2;
         this.inputs = input;
         this.output = output;
+        this.name = name;
+    }
+
+    @Override
+    public String GetName() {
+        return this.name;
     }
 
     @Override
@@ -104,4 +110,6 @@ public class JoinGraphNode extends GraphNode {
 
     private List<TreeNode> mapperFilters;
     private TreeNode reducerFilters;
+
+    private String name;
 }

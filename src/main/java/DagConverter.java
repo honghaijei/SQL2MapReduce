@@ -69,7 +69,7 @@ public class DagConverter {
             Schema newSchema = Schema.Combine(newTableName, SchemaSet.Instance().Get(r1), SchemaSet.Instance().Get(r2));
             SchemaSet.Instance().Add(newSchema);
 
-            JoinGraphNode jgn = new JoinGraphNode(c1.GetKey(), c2.GetKey(), Arrays.asList(r1, r2), newTableName);
+            JoinGraphNode jgn = new JoinGraphNode(newTableName, c1.GetKey(), c2.GetKey(), Arrays.asList(r1, r2), newTableName);
             ufs.Add(c1.GetTable(), c2.GetTable());
             ufs.Add(newTableName, c1.GetTable());
             nodes.add(jgn);
@@ -105,7 +105,7 @@ public class DagConverter {
                 groupByKeys.add(new Column(c, inputTable));
             }
             String newTable = Utils.GetTaskName("AGG");
-            AggrGraphNode aggrNode = new AggrGraphNode(groupByKeys, node.columns, null, inputTable, newTable);
+            AggrGraphNode aggrNode = new AggrGraphNode(newTable, groupByKeys, node.columns, null, inputTable, newTable);
             inputTable = newTable;
             SchemaSet.Instance().Add(aggrNode.GetOutputSchema());
             nodes.add(aggrNode);
@@ -116,7 +116,7 @@ public class DagConverter {
                 orderByKeys.add(new Column(s, inputTable));
             }
             String newTable = Utils.GetTaskName("SORT");
-            OrderByGraphNode sortNode = new OrderByGraphNode(orderByKeys, inputTable, newTable);
+            OrderByGraphNode sortNode = new OrderByGraphNode(newTable, orderByKeys, inputTable, newTable);
             SchemaSet.Instance().Add(sortNode.GetOutputSchema());
             nodes.add(sortNode);
         }

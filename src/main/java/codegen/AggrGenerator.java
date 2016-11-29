@@ -31,7 +31,8 @@ public class AggrGenerator {
     }
     public String Generate() {
         return Helper.Import +
-                "public class Main {\n" +
+                "public class " + this.node.GetName() + " {\n" +
+                Helper.JoinFunction +
                 Helper.SplitFunction +
                 new CompositeKeyGenerator(groupByColTypes).Generate() +
                 AggrMapper() +
@@ -133,7 +134,7 @@ public class AggrGenerator {
         return "    public static void main(String[] args) throws Exception{\n" +
                 "        Configuration conf = new Configuration();\n" +
                 "        Job job = new Job(conf,\"Sort\");\n" +
-                "        job.setJarByClass(Main.class);\n" +
+                "        job.setJarByClass(" + this.node.GetName() + ".class);\n" +
                 "        job.setMapperClass(Map.class);\n" +
                 "        job.setReducerClass(Reduce.class);\n" +
                 "        job.setMapOutputKeyClass(CompositeKey.class);\n" +

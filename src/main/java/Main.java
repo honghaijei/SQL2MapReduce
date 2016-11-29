@@ -58,7 +58,7 @@ public class Main {
         c.Convert(select);
         int i = 1;
         for (GraphNode node : c.GetNodes()) {
-            try(PrintWriter out = new PrintWriter(outputPath + "/" + (i++) + "." + node.GetOutput() + ".java")){
+            try(PrintWriter out = new PrintWriter(outputPath + "/" + node.GetName() + ".java")){
                 out.println(node.Generate());
             } catch (Exception e) {
                 e.printStackTrace();

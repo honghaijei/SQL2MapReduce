@@ -9,6 +9,8 @@ import dag.JoinGraphNode;
 import java.util.Arrays;
 import java.util.List;
 
+import static codegen.Helper.JoinFunction;
+
 /**
  * Created by honghaijie on 11/15/16.
  */
@@ -26,8 +28,9 @@ public class JoinGenerator {
     }
     public String Generate() {
         return Helper.Import +
-                "public class Main {\n" +
+                "public class " + this.node.GetName() + " {\n" +
                 Helper.SplitFunction +
+                Helper.JoinFunction +
                 new CompositeKeyGenerator(joinColTypes).Generate() +
                 JoinMapper() +
                 JoinReducer() +
@@ -155,7 +158,7 @@ public class JoinGenerator {
         return "    public static void main(String[] args) throws Exception{\n" +
                 "        Configuration conf = new Configuration();\n" +
                 "        Job job = new Job(conf,\"Sort\");\n" +
-                "        job.setJarByClass(Main.class);\n" +
+                "        job.setJarByClass(" + this.node.GetName() + ".class);\n" +
                 "        job.setMapperClass(Map.class);\n" +
                 "        job.setReducerClass(Reduce.class);\n" +
                 "        job.setMapOutputKeyClass(CompositeKey.class);\n" +
