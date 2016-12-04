@@ -2,6 +2,7 @@ package codegen;
 
 import astree.ArithNode;
 import astree.FilterNode;
+import astree.TreeNode;
 import common.schema.DataType;
 import common.schema.Schema;
 import dag.JoinGraphNode;
@@ -47,16 +48,21 @@ public class JoinGenerator {
                 "        }";
     }
     public String JoinMapper() {
+        List<TreeNode> filters = node.GetMapperFilter();
         return "    public static class Map extends Mapper<Object,Text, CompositeKey,Text>{\n" +
                 JoinSetup() +
                 "        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{\n" +
                 "            String line = value.toString();\n" +
                 "            if (table == 0) {\n" +
                 "                String[] arr = Split(line, '|',  " + schema1.size() + ");\n" +
-                "                context.write(new CompositeKey(" + JoinMapperLeftCompositeArgs(joinColLeftIndex, schema1) + "), new Text(table + \"|\" + line));\n" +
+                "                if (" + new WhereGenerator(filters.get(0), Arrays.asList(node.GetInputSchemas().get(0))).Generate() + ") {\n" +
+                "                    context.write(new CompositeKey(" + JoinMapperLeftCompositeArgs(joinColLeftIndex, schema1) + "), new Text(table + \"|\" + line));\n" +
+                "                }" +
                 "            } else {\n" +
                 "                String[] arr = Split(line, '|', " + schema2.size() + ");\n" +
-                "                context.write(new CompositeKey(" + JoinMapperLeftCompositeArgs(joinColRightIndex, schema2) + "), new Text(table + \"|\" + line));\n" +
+                "                if (" + new WhereGenerator(filters.get(1), Arrays.asList(node.GetInputSchemas().get(1))).Generate() + ") {\n" +
+                "                    context.write(new CompositeKey(" + JoinMapperLeftCompositeArgs(joinColRightIndex, schema2) + "), new Text(table + \"|\" + line));\n" +
+                "                }\n" +
                 "            }\n" +
                 "        }\n" +
                 "    }";

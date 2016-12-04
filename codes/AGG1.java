@@ -14,7 +14,16 @@ import java.util.List;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class AGG1 {
-    public static String[] Split(String s, char seperator, int expected_length) {
+    public static String Join(String sep, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; ++i) {
+            if (i != 0) {
+                sb.append(sep);
+            }
+            sb.append(arr[i]);
+        }
+        return sb.toString();
+    }    public static String[] Split(String s, char seperator, int expected_length) {
         String[] code = new String[expected_length];
         int pos = 0;
         for(int i = 0;;) {

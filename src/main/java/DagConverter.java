@@ -1,4 +1,5 @@
 import astree.*;
+import codegen.WhereGenerator;
 import common.UnionFindSet;
 import common.Utils;
 import common.schema.Schema;
@@ -46,6 +47,7 @@ public class DagConverter {
         }
         return ans;
     }
+
     public String GenerateJoinTree(List<SimpleFilterNode> eqs, List<String> tables, TreeNode noeqs) {
         Set<String> tableSet = new HashSet<>(tables);
         UnionFindSet<String> ufs = new UnionFindSet();
@@ -76,8 +78,65 @@ public class DagConverter {
             msj.put(newTableName, jgn);
             ans = jgn;
         }
-        ans.AddReducerFilter(noeqs);
+        ans.SetReducerFilter(noeqs);
         return ans.GetOutput();
+    }
+    private GraphNode GetNodeByOutput(String output) {
+        for (GraphNode node : nodes) {
+            if (node.GetOutput().equals(output)) {
+                return node;
+            }
+        }
+        return null;
+    }
+    public void PushDownPredicates(GraphNode node) {
+        List<String> inputs = node.GetInputs();
+        TreeNode filter = node.GetReducerFilter();
+        filter = Utils.SimplifyFilterNode(filter);
+        List<TreeNode> filters = new ArrayList<>();
+        if (filter instanceof SimpleFilterNode) {
+            filters.add(filter);
+        } else {
+            FilterNode fn = (FilterNode)filter;
+            if (fn != null && fn.IsAnd()) {
+                for (TreeNode f : fn.filters) {
+                    filters.add(f);
+                }
+            }
+        }
+        List<Schema> schemas = new ArrayList<>();
+        for (String input : inputs) {
+            schemas.add(SchemaSet.Instance().Get(input));
+        }
+        List<TreeNode> mapperFilter = new ArrayList<>();
+        for (int i = 0; i < node.GetInputs().size(); ++i) {
+            mapperFilter.add(null);
+        }
+        List<TreeNode> reducerFilter = new ArrayList<>();
+        for (TreeNode f : filters) {
+            Set<String> filterTables = new WhereGenerator(f, schemas).GetTables();
+            if (filterTables.size() == 1) {
+                String tableName = filterTables.iterator().next();
+                GraphNode intermediate = GetNodeByOutput(tableName);
+                if (intermediate == null) {
+                    int idx = node.GetInputs().indexOf(tableName);
+                    mapperFilter.set(idx, Utils.And(mapperFilter.get(idx), f));
+                } else {
+                    TreeNode nf = Utils.And(intermediate.GetReducerFilter(), f);
+                    nf = Utils.SimplifyFilterNode(nf);
+                    intermediate.SetReducerFilter(nf);
+                }
+            } else {
+                reducerFilter.add(f);
+            }
+        }
+        node.SetMapperFilter(mapperFilter);
+        node.SetReducerFilter(Utils.And(reducerFilter));
+        for (String input : node.GetInputs()) {
+            GraphNode ch = GetNodeByOutput(input);
+            if (ch == null) continue;
+            PushDownPredicates(ch);
+        }
     }
     public String Convert(SelectNode node) {
         List<TableNode> tables = node.from;
@@ -120,6 +179,7 @@ public class DagConverter {
             SchemaSet.Instance().Add(sortNode.GetOutputSchema());
             nodes.add(sortNode);
         }
+        PushDownPredicates(nodes.get(2));
         return inputTable;
     }
     public List<GraphNode> GetNodes() {

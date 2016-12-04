@@ -8,7 +8,9 @@ import astree.SimpleFilterNode;
 import astree.TreeNode;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by honghaijie on 11/14/16.
@@ -18,7 +20,28 @@ public class WhereGenerator {
         this.node = node;
         this.schema = schema;
     }
+    public Set<String> GetTables() {
+        Set<String> ans = new HashSet<>();
+        GetTables(node, ans);
+        return ans;
+    }
+    private void GetTables(TreeNode root, Set<String> tables) {
+        if (root instanceof SimpleFilterNode) {
+            SimpleFilterNode sfn = (SimpleFilterNode)root;
+            new ArithExpressionGenerator(sfn.left, schema, null).GetTables(tables);
+            new ArithExpressionGenerator(sfn.right, schema, null).GetTables(tables);
+        }
+        if (root instanceof FilterNode) {
+            FilterNode fn = (FilterNode)root;
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < fn.filters.size(); ++i) {
+                GetTables(fn.filters.get(i), tables);
+            }
+        }
+    }
     public String Generate() {
+        if (node == null) return "(true)";
         return GenerateExperssion(node);
     }
     private String GenerateExperssion(TreeNode root) {

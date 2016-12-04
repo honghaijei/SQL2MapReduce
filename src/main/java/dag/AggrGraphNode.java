@@ -69,12 +69,12 @@ public class AggrGraphNode extends GraphNode {
     }
 
     @Override
-    public void AddMapperFilter(List<TreeNode> filters) {
+    public void SetMapperFilter(List<TreeNode> filters) {
         this.mapperFilters = filters;
     }
 
     @Override
-    public void AddReducerFilter(TreeNode filters) {
+    public void SetReducerFilter(TreeNode filters) {
         this.reducerFilters = filters;
     }
 

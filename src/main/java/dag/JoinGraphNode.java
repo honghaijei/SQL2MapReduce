@@ -6,6 +6,7 @@ import astree.TreeNode;
 import codegen.JoinGenerator;
 import common.schema.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,17 +65,24 @@ public class JoinGraphNode extends GraphNode {
     }
 
     @Override
-    public void AddMapperFilter(List<TreeNode> filters) {
+    public void SetMapperFilter(List<TreeNode> filters) {
         this.mapperFilters = filters;
     }
 
     @Override
-    public void AddReducerFilter(TreeNode filters) {
+    public void SetReducerFilter(TreeNode filters) {
         this.reducerFilters = filters;
     }
 
     @Override
     public List<TreeNode> GetMapperFilter() {
+        if (this.mapperFilters == null) {
+            List<TreeNode> ans = new ArrayList<>();
+            for (int i = 0; i < inputs.size(); ++i) {
+                ans.add(null);
+            }
+            return ans;
+        }
         return this.mapperFilters;
     }
 

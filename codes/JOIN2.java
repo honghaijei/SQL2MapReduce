@@ -25,6 +25,15 @@ public class JOIN2 {
             pos = nx + 1;
         };
         return code;
+    }    public static String Join(String sep, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; ++i) {
+            if (i != 0) {
+                sb.append(sep);
+            }
+            sb.append(arr[i]);
+        }
+        return sb.toString();
     }    public static class CompositeKey implements WritableComparable<CompositeKey> {
         public CompositeKey() {}
         public CompositeKey(Integer k0) {
@@ -55,10 +64,13 @@ public class JOIN2 {
             String line = value.toString();
             if (table == 0) {
                 String[] arr = Split(line, '|',  12);
-                context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
-            } else {
+                if ((true)) {
+                    context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
+                }            } else {
                 String[] arr = Split(line, '|', 9);
-                context.write(new CompositeKey(Integer.parseInt(arr[1])), new Text(table + "|" + line));
+                if ((arr[4].compareTo("1993-05-01") >= 0&&arr[4].compareTo("1993-08-01") < 0)) {
+                    context.write(new CompositeKey(Integer.parseInt(arr[1])), new Text(table + "|" + line));
+                }
             }
         }
     }    public static class Reduce extends Reducer<CompositeKey,Text,NullWritable,Text>{

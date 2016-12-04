@@ -14,7 +14,27 @@ import java.util.List;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class SORT1 {
-    public static class CompositeKey implements WritableComparable<CompositeKey> {
+    public static String Join(String sep, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; ++i) {
+            if (i != 0) {
+                sb.append(sep);
+            }
+            sb.append(arr[i]);
+        }
+        return sb.toString();
+    }    public static String[] Split(String s, char seperator, int expected_length) {
+        String[] code = new String[expected_length];
+        int pos = 0;
+        for(int i = 0;;) {
+            int nx = s.indexOf(seperator, pos);
+            if (nx == -1 || i == expected_length - 1) nx = s.length();
+            code[i++] = s.substring(pos, nx);
+            if (nx == s.length()) break;
+            pos = nx + 1;
+        };
+        return code;
+    }    public static class CompositeKey implements WritableComparable<CompositeKey> {
         public CompositeKey() {}
         public CompositeKey(Double k0) {
             this.k0= k0;
@@ -35,18 +55,7 @@ public class SORT1 {
         public Double k0;
     }
     public static class Map extends Mapper<Object,Text, CompositeKey,Text>{
-    public static String[] Split(String s, char seperator, int expected_length) {
-        String[] code = new String[expected_length];
-        int pos = 0;
-        for(int i = 0;;) {
-            int nx = s.indexOf(seperator, pos);
-            if (nx == -1 || i == expected_length - 1) nx = s.length();
-            code[i++] = s.substring(pos, nx);
-            if (nx == s.length()) break;
-            pos = nx + 1;
-        };
-        return code;
-    }        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
+        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
             String line = value.toString();
             String[] arr = Split(line, '|', 8);
             context.write(new CompositeKey(Double.parseDouble(arr[2])), new Text(line));

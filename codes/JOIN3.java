@@ -25,6 +25,15 @@ public class JOIN3 {
             pos = nx + 1;
         };
         return code;
+    }    public static String Join(String sep, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; ++i) {
+            if (i != 0) {
+                sb.append(sep);
+            }
+            sb.append(arr[i]);
+        }
+        return sb.toString();
     }    public static class CompositeKey implements WritableComparable<CompositeKey> {
         public CompositeKey() {}
         public CompositeKey(Integer k0) {
@@ -55,10 +64,13 @@ public class JOIN3 {
             String line = value.toString();
             if (table == 0) {
                 String[] arr = Split(line, '|',  16);
-                context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
-            } else {
+                if (arr[8].equals("R")) {
+                    context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
+                }            } else {
                 String[] arr = Split(line, '|', 21);
-                context.write(new CompositeKey(Integer.parseInt(arr[12])), new Text(table + "|" + line));
+                if ((true)) {
+                    context.write(new CompositeKey(Integer.parseInt(arr[12])), new Text(table + "|" + line));
+                }
             }
         }
     }    public static class Reduce extends Reducer<CompositeKey,Text,NullWritable,Text>{
@@ -79,10 +91,8 @@ public class JOIN3 {
             }
             for (String[] arr1 : leftTuples) {
                 for (String[] arr2 : rightTuples) {
-                    String[] arr = new String[]{arr1[0],arr1[1],arr1[2],arr1[3],arr1[4],arr1[5],arr1[6],arr1[7],arr1[8],arr1[9],arr1[10],arr1[11],arr1[12],arr1[13],arr1[14],arr1[15],arr2[0],arr2[1],arr2[2],arr2[3],arr2[4],arr2[5],arr2[6],arr2[7],arr2[8],arr2[9],arr2[10],arr2[11],arr2[12],arr2[13],arr2[14],arr2[15],arr2[16],arr2[17],arr2[18],arr2[19],arr2[20]};
-                    if ((arr[32].compareTo("1993-05-01") >= 0&&arr[32].compareTo("1993-08-01") < 0&&arr[8].equals("R"))) {
-                        context.write(t, new Text(String.join("|", arr)));
-                    }                }
+                    context.write(t, new Text(arr1[0] + '|' + arr1[1] + '|' + arr1[2] + '|' + arr1[3] + '|' + arr1[4] + '|' + arr1[5] + '|' + arr1[6] + '|' + arr1[7] + '|' + arr1[8] + '|' + arr1[9] + '|' + arr1[10] + '|' + arr1[11] + '|' + arr1[12] + '|' + arr1[13] + '|' + arr1[14] + '|' + arr1[15] + '|' + arr2[0] + '|' + arr2[1] + '|' + arr2[2] + '|' + arr2[3] + '|' + arr2[4] + '|' + arr2[5] + '|' + arr2[6] + '|' + arr2[7] + '|' + arr2[8] + '|' + arr2[9] + '|' + arr2[10] + '|' + arr2[11] + '|' + arr2[12] + '|' + arr2[13] + '|' + arr2[14] + '|' + arr2[15] + '|' + arr2[16] + '|' + arr2[17] + '|' + arr2[18] + '|' + arr2[19] + '|' + arr2[20]));
+                }
             }
         }
     }    public static void main(String[] args) throws Exception{

@@ -25,8 +25,8 @@ public abstract class GraphNode {
     public abstract List<String> GetInputs();
     public abstract String GetOutput();
     public abstract String Generate();
-    public abstract void AddMapperFilter(List<TreeNode> filters);
-    public abstract void AddReducerFilter(TreeNode filters);
+    public abstract void SetMapperFilter(List<TreeNode> filters);
+    public abstract void SetReducerFilter(TreeNode filters);
     public abstract List<TreeNode>  GetMapperFilter();
     public abstract TreeNode GetReducerFilter();
 }

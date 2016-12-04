@@ -6,7 +6,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import astree.ArithNode;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static common.Utils.GetSchemaIdxByColumnName;
 
@@ -32,6 +34,23 @@ public class ArithExpressionGenerator {
         }
         for (ArithNode ch : cur.children) {
             SearchAggrFunction(ch, nodes);
+        }
+    }
+    public void GetTables(Set<String> set) {
+        GetTables(node, set);
+    }
+    private void GetTables(ArithNode node, Set<String> set) {
+        if (node.constant != null) {
+            return;
+        }
+        if (node.columnName != null) {
+            int schemaIdx = GetSchemaIdxByColumnName(schemas, node.columnName);
+            set.add(schemas.get(schemaIdx).Name());
+        }
+
+        for (int i = 0; i < node.children.size(); ++i) {
+            ArithNode ch = node.children.get(i);
+            GetTables(ch, set);
         }
     }
     public String Generate() {
