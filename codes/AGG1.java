@@ -106,7 +106,7 @@ public class AGG1 {
         public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
             String line = value.toString();
             String[] arr = Split(line, '|', 37);
-            context.write(new CompositeKey(Integer.parseInt(arr[16]), arr[17], Double.parseDouble(arr[21]), arr[20], arr[25], arr[18], arr[23]), new Text(line));
+            context.write(new CompositeKey(Integer.parseInt(arr[0]), arr[1], Double.parseDouble(arr[5]), arr[4], arr[9], arr[2], arr[7]), new Text(line));
         }
     }
     public static class Reduce extends Reducer<CompositeKey,Text,NullWritable,Text>{
@@ -118,9 +118,9 @@ public class AGG1 {
             for (Text value : values) {
                 arr = Split(value.toString(), '|', 37);
                 ++count;
-                agg0 += Double.parseDouble(arr[5])*(1-Double.parseDouble(arr[6]));
+                agg0 += Double.parseDouble(arr[17])*(1-Double.parseDouble(arr[18]));
             }
-                        context.write(t, new Text(((Object)(Integer.parseInt(arr[16]))).toString()+"|"+((Object)(arr[17])).toString()+"|"+((Object)(agg0)).toString()+"|"+((Object)(Double.parseDouble(arr[21]))).toString()+"|"+((Object)(arr[25])).toString()+"|"+((Object)(arr[18])).toString()+"|"+((Object)(arr[20])).toString()+"|"+((Object)(arr[23])).toString()));
+                        context.write(t, new Text(((Object)(Integer.parseInt(arr[0]))).toString()+"|"+((Object)(arr[1])).toString()+"|"+((Object)(agg0)).toString()+"|"+((Object)(Double.parseDouble(arr[5]))).toString()+"|"+((Object)(arr[9])).toString()+"|"+((Object)(arr[2])).toString()+"|"+((Object)(arr[4])).toString()+"|"+((Object)(arr[7])).toString()));
         }
     }
     public static void main(String[] args) throws Exception{

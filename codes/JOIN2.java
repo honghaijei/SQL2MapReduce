@@ -63,13 +63,13 @@ public class JOIN2 {
         }        public void map(Object key,Text value,Context context) throws IOException,InterruptedException{
             String line = value.toString();
             if (table == 0) {
-                String[] arr = Split(line, '|',  12);
-                if ((true)) {
+                String[] arr = Split(line, '|',  16);
+                if (arr[8].equals("R")) {
                     context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
                 }            } else {
                 String[] arr = Split(line, '|', 9);
                 if ((arr[4].compareTo("1993-05-01") >= 0&&arr[4].compareTo("1993-08-01") < 0)) {
-                    context.write(new CompositeKey(Integer.parseInt(arr[1])), new Text(table + "|" + line));
+                    context.write(new CompositeKey(Integer.parseInt(arr[0])), new Text(table + "|" + line));
                 }
             }
         }
@@ -91,7 +91,7 @@ public class JOIN2 {
             }
             for (String[] arr1 : leftTuples) {
                 for (String[] arr2 : rightTuples) {
-                    context.write(t, new Text(arr1[0] + '|' + arr1[1] + '|' + arr1[2] + '|' + arr1[3] + '|' + arr1[4] + '|' + arr1[5] + '|' + arr1[6] + '|' + arr1[7] + '|' + arr1[8] + '|' + arr1[9] + '|' + arr1[10] + '|' + arr1[11] + '|' + arr2[0] + '|' + arr2[1] + '|' + arr2[2] + '|' + arr2[3] + '|' + arr2[4] + '|' + arr2[5] + '|' + arr2[6] + '|' + arr2[7] + '|' + arr2[8]));
+                    context.write(t, new Text(arr1[0] + '|' + arr1[1] + '|' + arr1[2] + '|' + arr1[3] + '|' + arr1[4] + '|' + arr1[5] + '|' + arr1[6] + '|' + arr1[7] + '|' + arr1[8] + '|' + arr1[9] + '|' + arr1[10] + '|' + arr1[11] + '|' + arr1[12] + '|' + arr1[13] + '|' + arr1[14] + '|' + arr1[15] + '|' + arr2[0] + '|' + arr2[1] + '|' + arr2[2] + '|' + arr2[3] + '|' + arr2[4] + '|' + arr2[5] + '|' + arr2[6] + '|' + arr2[7] + '|' + arr2[8]));
                 }
             }
         }
@@ -103,7 +103,7 @@ public class JOIN2 {
         job.setReducerClass(Reduce.class);
         job.setMapOutputKeyClass(CompositeKey.class);
         job.setOutputValueClass(Text.class);
-        FileInputFormat.addInputPath(job, new Path("JOIN1"));
+        FileInputFormat.addInputPath(job, new Path("lineitem"));
         FileInputFormat.addInputPath(job, new Path("orders"));
         FileOutputFormat.setOutputPath(job, new Path("JOIN2"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);

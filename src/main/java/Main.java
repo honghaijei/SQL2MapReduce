@@ -30,8 +30,8 @@ public class Main {
                 "\tnation\n" +
                 "where\n" +
                 "\tc_nationkey = n_nationkey\n" +
-                "\tand c_custkey = o_custkey\n" +
                 "\tand l_orderkey = o_orderkey\n" +
+                "\tand c_custkey = o_custkey\n" +
                 "\tand o_orderdate >= '1993-05-01'\n" +
                 "\tand o_orderdate < '1993-08-01'\n" +
                 "\tand l_returnflag = 'R'\n" +

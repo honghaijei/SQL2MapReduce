@@ -100,4 +100,69 @@ public class Helper {
             "        }\n" +
             "        return sb.toString();\n" +
             "    }";
+    public static String OrderPreserveEncoder = "import java.nio.ByteBuffer;\n" +
+            "import java.util.ArrayList;\n" +
+            "import java.util.List;\n" +
+            "\n" +
+            "public class OrderPreserveEncoder {\n" +
+            "    public OrderPreserveEncoder() {\n" +
+            "    }\n" +
+            "    private void appendByteArray(byte[] arr) {\n" +
+            "        for (byte b : arr) {\n" +
+            "            encode.add(b);\n" +
+            "        }\n" +
+            "    }\n" +
+            "    public void EncodeString(String s) {\n" +
+            "        try {\n" +
+            "            appendByteArray(s.getBytes(\"utf-8\"));\n" +
+            "            encode.add((byte) 0);\n" +
+            "        } catch (Exception e) {\n" +
+            "            e.printStackTrace();\n" +
+            "        }\n" +
+            "        flag = flag * 4 + 1;\n" +
+            "    }\n" +
+            "    public void EncodeInteger(int i) {\n" +
+            "        long r = i;\n" +
+            "        r -= Integer.MIN_VALUE;\n" +
+            "        byte[] bytes = ByteBuffer.allocate(8).putLong(r).array();\n" +
+            "        for (int p = 4; p < 8; ++p) {\n" +
+            "            encode.add(bytes[p]);\n" +
+            "        }\n" +
+            "        flag = flag * 4 + 2;\n" +
+            "    }\n" +
+            "    public void EncodeDouble(double d) {\n" +
+            "        long lng = Double.doubleToLongBits(d);\n" +
+            "        lng ^= (1l << 63);\n" +
+            "        byte[] bytes = ByteBuffer.allocate(8).putLong(lng).array();\n" +
+            "        appendByteArray(bytes);\n" +
+            "        flag = flag * 4 + 3;\n" +
+            "    }\n" +
+            "    public byte[] GetEncodedByteArray() {\n" +
+            "        byte[] bytes = ByteBuffer.allocate(8).putLong(flag).array();\n" +
+            "        appendByteArray(bytes);\n" +
+            "        byte[] ans = new byte[encode.size()];\n" +
+            "        for (int i = 0; i < ans.length; ++i) {\n" +
+            "            ans[i] = encode.get(i);\n" +
+            "        }\n" +
+            "        return ans;\n" +
+            "    }\n" +
+            "    private int flag = 0;\n" +
+            "    private List<Byte> encode = new ArrayList<Byte>();\n" +
+            "\n" +
+            "    public static int compare(byte[] a, byte[] b) {\n" +
+            "        for (int i = 0; i < a.length; ++i) {\n" +
+            "            if (i >= b.length) {\n" +
+            "                return 1;\n" +
+            "            }\n" +
+            "            int av = (int) a[i] & 0xff;\n" +
+            "            int bv = (int) b[i] & 0xff;\n" +
+            "            if (av > bv) {\n" +
+            "                return 1;\n" +
+            "            } else if (av < bv) {\n" +
+            "                return -1;\n" +
+            "            }\n" +
+            "        }\n" +
+            "        return a.length == b.length ? 0 : -1;\n" +
+            "    }\n" +
+            "}\n";
 }
